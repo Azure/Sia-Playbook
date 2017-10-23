@@ -8,15 +8,16 @@ using Sia.Playbook.Authentication;
 using Sia.Data.Playbooks;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using Sia.Domain.Playbook;
 
 namespace Sia.Playbook.Requests
 {
     public class GetEventTypeRequest : AuthenticatedRequest<EventType>
     {
-        public GetEventTypeRequest(long eventTypeId, AuthenticatedUserContext userContext)
+        public GetEventTypeRequest(long id, AuthenticatedUserContext userContext)
             :base(userContext)
         {
-            EventTypeId = eventTypeId;
+            EventTypeId = id;
         }
 
         public long EventTypeId { get; private set; }
@@ -29,6 +30,9 @@ namespace Sia.Playbook.Requests
         }
 
         public override async Task<EventType> Handle(GetEventTypeRequest message)
-            => Mapper.Map<EventType>(await _context.EventTypes.FirstOrDefaultAsync(et => et.Id == message.EventTypeId));
+            => Mapper.Map<EventType>(await _context
+                                        .EventTypes
+                                        .WithEagerLoading()
+                                        .FirstOrDefaultAsync(et => et.Id == message.EventTypeId));
     }
 }

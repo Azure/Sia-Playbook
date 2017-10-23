@@ -30,6 +30,6 @@ namespace Sia.Playbook.Requests
             _context = context;
         }
 
-        public abstract Task HandleAsync(TRequest message);
+        public abstract Task Handle(TRequest message);
     }
 }

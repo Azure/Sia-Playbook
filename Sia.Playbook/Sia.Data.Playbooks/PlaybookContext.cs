@@ -6,7 +6,9 @@ namespace Sia.Data.Playbooks
 {
     public class PlaybookContext : DbContext
     {
-        public PlaybookContext(DbContextOptions<PlaybookContext> options) { }
+        public PlaybookContext(DbContextOptions<PlaybookContext> options)
+            :base(options)
+        { }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

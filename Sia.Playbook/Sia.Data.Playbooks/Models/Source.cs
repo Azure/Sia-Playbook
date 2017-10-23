@@ -10,6 +10,7 @@ namespace Sia.Data.Playbooks.Models
         public long Id { get; set; }
         public SourceObject SourceObject { get; set; }
         public string Key { get; set; }
+        public string Name { get; set; }
     }
 
     public enum SourceObject

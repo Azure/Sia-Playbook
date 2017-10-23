@@ -3,14 +3,25 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp2.0</TargetFramework>
     <PackageTargetFallback>$(PackageTargetFallback);portable-net45+win8+wp8+wpa81;</PackageTargetFallback>
+    <ApplicationIcon />
+    <OutputType>Library</OutputType>
+    <StartupObject />
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="6.1.1" />
+    <PackageReference Include="AutoMapper.Collection" Version="3.1.2" />
+    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="3.0.1" />
+    <PackageReference Include="MediatR" Version="3.0.1" />
+    <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="3.0.0" />
     <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.1.1" />
     <PackageReference Include="Microsoft.AspNetCore" Version="2.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="2.0.0" />
+    <PackageReference Include="Microsoft.Sia.Domain" Version="1.1.0-alpha" />
     <PackageReference Include="Microsoft.Sia.Domain.ApiModels" Version="1.1.0-alpha" />
+    <PackageReference Include="Microsoft.Sia.Shared" Version="1.1.0-alpha" />
   </ItemGroup>
 
   <ItemGroup>
@@ -19,6 +30,11 @@
 
   <ItemGroup>
     <Folder Include="Controllers\wwwroot\" />
+    <Folder Include="Initialization\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Sia.Data.Playbooks\Sia.Data.Playbook.csproj" />
   </ItemGroup>
 
 </Project>

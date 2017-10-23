@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Sia.Data.Playbooks.Models
 {
-    public class EventType : IEntity
+    public class EventType : IEntity, IJsonDataString
     {
         public long Id { get; set; }
         public string Name { get; set; }
@@ -14,5 +14,6 @@ namespace Sia.Data.Playbooks.Models
         public ICollection<Action> Actions
             => new ManyToManyCollection<EventType, EventTypeToActionAssociation, Action>(this, ActionAssociations);
 
+        public string Data { get; set; }
     }
 }

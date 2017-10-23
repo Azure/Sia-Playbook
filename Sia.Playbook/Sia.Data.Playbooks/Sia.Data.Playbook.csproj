@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Sia.Shared" Version="1.0.9-alpha" />
+    <PackageReference Include="Microsoft.Sia.Shared" Version="1.1.0-alpha" />
   </ItemGroup>
 
 </Project>

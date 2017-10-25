@@ -1,2 +1,3 @@
 [submodule "Sia-Root"]
+	path = SiaRoot
 	branch = pdimit/DomainInRoot

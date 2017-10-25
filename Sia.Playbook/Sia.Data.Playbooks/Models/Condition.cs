@@ -1,4 +1,5 @@
-﻿using Sia.Shared.Data;
+﻿using Sia.Domain.Playbook;
+using Sia.Shared.Data;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -22,27 +23,4 @@ namespace Sia.Data.Playbooks.Models
         public ConditionSet ConditionSet { get; set; }
         public long ConditionSetId { get; set; }
     }
-
-    public enum AssertionType
-    {
-        IsOrDoes,
-        IsNotOrDoesNot
-    }
-
-    public enum ConditionType
-    {
-        Equal,
-        Contain,
-        HaveValue,
-        GreaterThan,
-        LessThan
-    }
-
-    public enum DataFormat
-    {
-        String,
-        DateTime,
-        Integer
-    }
-
 }

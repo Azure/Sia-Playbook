@@ -33,6 +33,6 @@ namespace Sia.Playbook.Requests
             => Mapper.Map<EventType>(await _context
                                         .EventTypes
                                         .WithEagerLoading()
-                                        .FirstOrDefaultAsync(et => et.Id == message.EventTypeId));
+                                        .FirstOrDefaultAsync(record => record.Id == message.EventTypeId));
     }
 }

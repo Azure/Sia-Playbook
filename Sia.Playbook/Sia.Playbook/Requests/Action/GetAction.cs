@@ -29,6 +29,9 @@ namespace Sia.Playbook.Requests
         }
 
         public override async Task<Domain.Playbook.Action> Handle(GetActionRequest message)
-            => Mapper.Map<Domain.Playbook.Action>(await _context.Actions.FirstOrDefaultAsync(et => et.Id == message.ActionId));
+            => Mapper.Map<Domain.Playbook.Action>(await _context
+                .Actions
+                .WithEagerLoading()
+                .FirstOrDefaultAsync(record => record.Id == message.ActionId));
     }
 }

@@ -1,0 +1,3 @@
+[submodule "Sia.Playbook/Sia-Root"]
+	path = Sia.Playbook/Sia-Root
+	url = https://github.com/Azure/Sia-Root

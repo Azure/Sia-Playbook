@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Sia.Data.Playbooks.Models;
 using Sia.Domain.ApiModels.Playbooks;
 using Sia.Playbook.Requests;
 using Sia.Shared.Authentication;
@@ -16,13 +17,13 @@ namespace Sia.Playbook.Controllers
         {
         }
 
-        [HttpGet("{id}", Name = nameof(Get))]
+        [HttpGet("{id}", Name = nameof(Get) + nameof(Action))]
         public async Task<IActionResult> Get(long id)
             => Ok(await _mediator.Send(new GetActionRequest(id, _authContext)));
 
         [HttpPost()]
         public async Task<IActionResult> Post(CreateAction content)
-            => CreatedAtRoute(nameof(Get), await _mediator.Send(new PostActionRequest(content, _authContext)));
+            => CreatedAtRoute(nameof(Get) + nameof(Action), await _mediator.Send(new PostActionRequest(content, _authContext)));
 
         [HttpPut("{actionId}/eventTypes/{eventTypeId}")]
         public async Task<IActionResult> AssociateEventType(long actionId, long eventTypeId)

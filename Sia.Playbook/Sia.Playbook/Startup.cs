@@ -13,13 +13,13 @@ using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
 using System.Buffers;
 using Microsoft.AspNetCore.Mvc.Routing;
-using Sia.Gateway.Protocol;
+using Sia.Shared.Protocol;
 using MediatR;
 using Sia.Playbook.Requests;
 using System.Reflection;
 using Sia.Data.Playbook;
 using Sia.Playbook.Initialization;
-using Sia.Playbook.Authentication;
+using Sia.Shared.Authentication;
 
 namespace Sia.Playbook
 {

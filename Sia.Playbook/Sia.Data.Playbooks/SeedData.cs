@@ -28,7 +28,7 @@ namespace Sia.Data.Playbook
                     {
                         new ActionTemplateSource()
                         {
-                            SourceObject = SourceObject.Ticket,
+                            SourceObject = Domain.Playbook.SourceObject.Ticket,
                             Key = "originId",
                             Name = "ticketId"
                         }
@@ -45,13 +45,13 @@ namespace Sia.Data.Playbook
                             new Condition()
                             {
                                 Name = "High severity",
-                                DataFormat = DataFormat.Integer,
-                                AssertionType = AssertionType.IsOrDoes,
-                                ConditionType = ConditionType.LessThan,
+                                DataFormat = Domain.Playbook.DataFormat.Integer,
+                                AssertionType = Domain.Playbook.AssertionType.IsOrDoes,
+                                ConditionType = Domain.Playbook.ConditionType.LessThan,
                                 IntegerComparisonValue = 3,
                                 ConditionSource = new ConditionSource()
                                 {
-                                    SourceObject = SourceObject.Ticket,
+                                    SourceObject = Domain.Playbook.SourceObject.Ticket,
                                     Key = "severity",
                                     Name = "Severity"
                                 }

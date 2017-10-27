@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Sia.Data.Playbooks;
-using Sia.Domain.Playbook;
-using Sia.Playbook.Authentication;
+using Sia.Shared.Authentication;
 using Microsoft.EntityFrameworkCore;
+using Sia.Shared.Requests;
 
 namespace Sia.Playbook.Requests
 {
@@ -23,7 +20,7 @@ namespace Sia.Playbook.Requests
     }
 
     public class AssociateActionWithEventTypeHandler
-        : DatabaseOperationHandler<AssociateActionWithEventTypeRequest>
+        : PlaybookDatabaseHandler<AssociateActionWithEventTypeRequest>
     {
         public AssociateActionWithEventTypeHandler(PlaybookContext context) : base(context)
         {

@@ -4,10 +4,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Sia.Domain.Playbook;
-using Sia.Playbook.Authentication;
+using Sia.Shared.Authentication;
 using Sia.Data.Playbooks;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using Sia.Shared.Requests;
 
 namespace Sia.Playbook.Requests
 {
@@ -24,7 +25,7 @@ namespace Sia.Playbook.Requests
         public long ActionTemplateId { get; private set; }
     }
 
-    public class GetActionTemplateSourceHandler : DatabaseOperationHandler<GetActionTemplateSourceRequest, Domain.Playbook.ActionTemplateSource>
+    public class GetActionTemplateSourceHandler : PlaybookDatabaseHandler<GetActionTemplateSourceRequest, ActionTemplateSource>
     {
         public GetActionTemplateSourceHandler(PlaybookContext context) : base(context)
         {

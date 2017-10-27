@@ -4,11 +4,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Sia.Domain;
-using Sia.Playbook.Authentication;
+using Sia.Shared.Authentication;
 using Sia.Data.Playbooks;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Sia.Domain.Playbook;
+using Sia.Shared.Requests;
 
 namespace Sia.Playbook.Requests
 {
@@ -23,7 +24,7 @@ namespace Sia.Playbook.Requests
         public long ConditionSourceId { get; private set; }
     }
 
-    public class GetConditionSourceHandler : DatabaseOperationHandler<GetConditionSourceRequest, ConditionSource>
+    public class GetConditionSourceHandler : PlaybookDatabaseHandler<GetConditionSourceRequest, ConditionSource>
     {
         public GetConditionSourceHandler(PlaybookContext context) : base(context)
         {

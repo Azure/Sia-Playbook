@@ -1,13 +1,14 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Sia.Playbook.Authentication;
+using Sia.Shared.Authentication;
 using Sia.Domain.ApiModels.Playbooks;
 using Sia.Data.Playbooks;
 using Sia.Domain.Playbook;
 using Sia.Domain;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using Sia.Shared.Requests;
 
 namespace Sia.Playbook.Requests
 {
@@ -23,7 +24,7 @@ namespace Sia.Playbook.Requests
         public long ActionId { get; }
     }
 
-    public class PostConditionSetHandler : DatabaseOperationHandler<PostConditionSetRequest, Domain.Playbook.ConditionSet>
+    public class PostConditionSetHandler : PlaybookDatabaseHandler<PostConditionSetRequest, Domain.Playbook.ConditionSet>
     {
         public PostConditionSetHandler(PlaybookContext context) : base(context)
         {

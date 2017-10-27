@@ -1,12 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using MediatR;
-using Sia.Playbook.Authentication;
-using Sia.Playbook.Requests;
+﻿using MediatR;
+using Microsoft.AspNetCore.Mvc;
 using Sia.Domain.ApiModels.Playbooks;
+using Sia.Playbook.Requests;
+using Sia.Shared.Authentication;
+using Sia.Shared.Controllers;
+using System.Threading.Tasks;
 
 namespace Sia.Playbook.Controllers
 {

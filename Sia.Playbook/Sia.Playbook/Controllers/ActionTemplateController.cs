@@ -4,9 +4,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using MediatR;
-using Sia.Playbook.Authentication;
+using Sia.Shared.Authentication;
 using Sia.Playbook.Requests;
 using Sia.Domain.ApiModels.Playbooks;
+using Sia.Shared.Controllers;
 
 namespace Sia.Playbook.Controllers
 {

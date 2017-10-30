@@ -20,6 +20,8 @@ using System.Reflection;
 using Sia.Data.Playbook;
 using Sia.Playbook.Initialization;
 using Sia.Shared.Authentication;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Sia.Shared.Middleware;
 
 namespace Sia.Playbook
 {
@@ -32,6 +34,10 @@ namespace Sia.Playbook
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
                 .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)
                 .AddEnvironmentVariables();
+            if (env.IsDevelopment())
+            {
+                builder.AddUserSecrets<Startup>();
+            }
             Configuration = builder.Build();
 
             _env = env;
@@ -59,7 +65,18 @@ namespace Sia.Playbook
                         new MvcJsonOptions().SerializerSettings,
                         ArrayPool<char>.Shared));
             });
-
+            services
+                .AddAuthentication(authOptions =>
+                {
+                    authOptions.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                    authOptions.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                })
+                .AddJwtBearer(jwtOptions =>
+                {
+                    jwtOptions.Authority = String.Format(Configuration["AzureAd:AadInstance"], Configuration["AzureAd:Tenant"]);
+                    jwtOptions.Audience = Configuration["ClientId"];
+                    jwtOptions.SaveToken = true;
+                });
             if (_env.IsDevelopment()) services.AddDbContext<PlaybookContext>(options => options.UseInMemoryDatabase("Live"));
             services.AddMediatR(typeof(GetEventTypeRequest).GetTypeInfo().Assembly);
         }
@@ -73,8 +90,10 @@ namespace Sia.Playbook
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
 
-            if (env.IsDevelopment()) app.UseDeveloperExceptionPage();
-
+            if (env.IsDevelopment()) { app.UseDeveloperExceptionPage(); }
+            else { app.UseMiddleware<ExceptionHandler>(); }
+            
+            app.UseAuthentication();
             app.UseSession();
             app.UseMvc();
 
@@ -85,7 +104,7 @@ namespace Sia.Playbook
 
         private static void ConfigureAuth(IServiceCollection services, IConfigurationRoot config)
         {
-            var incidentAuthConfig = new AzureActiveDirectoryAuthenticationInfo(config["Incident:ClientId"], config["Incident:ClientSecret"], config["AzureAd:Tenant"]);
+            var incidentAuthConfig = new AzureActiveDirectoryAuthenticationInfo("Unused placeholder", "Unused placeholder", config["AzureAd:Tenant"]);
             services.AddSingleton<AzureActiveDirectoryAuthenticationInfo>(i => incidentAuthConfig);
         }
     }

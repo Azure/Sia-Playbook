@@ -61,7 +61,27 @@ namespace Sia.Data.Playbook
                 }
             };
 
+            var testAction = new Playbooks.Models.Action()
+            {
+                ActionTemplate = new ActionTemplate()
+                {
+                    Name = "Action Without Conditions For Testing",
+                    IsUrl = true,
+                    Template = "https://www.bing.com",
+                    Sources = new HashSet<ActionTemplateSource>()
+                },
+                ConditionSets = new HashSet<ConditionSet>()
+                {
+                    new ConditionSet()
+                    {
+                        Name = "This condition should always be met",
+                        Type = ConditionSetType.NoneOf,
+                        Conditions = new HashSet<Condition>()
+                    }
+                }
+            };
             impactDetectedEventType.Actions.Add(notifyAction);
+            impactDetectedEventType.Actions.Add(testAction);
 
             context.EventTypes.Add(impactDetectedEventType);
 

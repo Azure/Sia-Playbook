@@ -80,10 +80,63 @@ namespace Sia.Data.Playbook
                     }
                 }
             };
+
+            var orphanAction = new Playbooks.Models.Action()
+            {
+                Name = "Orphaned Action",
+                ConditionSets = new HashSet<ConditionSet>()
+                {
+                    new ConditionSet()
+                    {
+                        Name = "Condition Set For Orphaned Action"
+                    }
+                },
+                ActionTemplate = new ActionTemplate()
+            };
+
+            var orphanEventType = new EventType()
+            {
+                Name = "Orphaned Event Type"
+            };
+
+            var orphanActionTemplate = new ActionTemplate()
+            {
+                Name = "Orphaned Action Template",
+                Sources = new HashSet<ActionTemplateSource>()
+                {
+                    new ActionTemplateSource()
+                    {
+                        Name = "Source for Orphaned Action Template"
+                    }
+                }
+            };
+
+            var orphanConditionSet = new ConditionSet()
+            {
+                Name = "Orphaned Condition Set",
+                Conditions = new HashSet<Condition>()
+                {
+                    new Condition()
+                    {
+                        Name = "Condition for Orphaned Condition Set"
+                    }
+                }
+            };
+
+            var orphanConditionSource = new ConditionSource()
+            {
+                Name = "Orphaned Condition Source"
+            };
+
             impactDetectedEventType.Actions.Add(notifyAction);
             impactDetectedEventType.Actions.Add(testAction);
 
             context.EventTypes.Add(impactDetectedEventType);
+            context.EventTypes.Add(orphanEventType);
+            context.Actions.Add(orphanAction);
+            context.ActionTemplates.Add(orphanActionTemplate);
+            context.ConditionSets.Add(orphanConditionSet);
+            context.ConditionSources.Add(orphanConditionSource);
 
             await context.SaveChangesAsync();
         }

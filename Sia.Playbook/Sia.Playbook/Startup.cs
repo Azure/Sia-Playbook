@@ -104,7 +104,7 @@ namespace Sia.Playbook
 
         private static void ConfigureAuth(IServiceCollection services, IConfigurationRoot config)
         {
-            var incidentAuthConfig = new AzureActiveDirectoryAuthenticationInfo("Unused placeholder", "Unused placeholder", config["AzureAd:Tenant"]);
+            var incidentAuthConfig = new AzureActiveDirectoryAuthenticationInfo("unused placeholder", "Unused placeholder", "Unused placeholder", config["AzureAd:Tenant"]);
             services.AddSingleton<AzureActiveDirectoryAuthenticationInfo>(i => incidentAuthConfig);
         }
     }

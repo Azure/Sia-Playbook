@@ -98,7 +98,24 @@ namespace Sia.Playbook
             app.UseMvc();
 
             AutoMapperStartup.InitializeAutomapper();
-            var dataAddTask = context.AddSeedData();
+
+            var token = Configuration["GitHub:Token"];
+            var name = Configuration["GitHub:Repository:Name"];
+            var owner = Configuration["GitHub:Repository:Owner"];
+
+            Task dataAddTask;
+            if (string.IsNullOrWhiteSpace(token)
+                || string.IsNullOrWhiteSpace(name)
+                || string.IsNullOrWhiteSpace(owner))
+            {
+                //Load from method in source control
+                dataAddTask = context.AddSeedData();
+            }
+            else
+            {
+                //Load from configured git repository
+                dataAddTask = context.AddSeedDataFromGitHub(token, name, owner);
+            }
             Task.WaitAll(dataAddTask);
         }
 

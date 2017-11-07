@@ -1,4 +1,5 @@
-﻿using Sia.Shared.Data;
+﻿using Sia.Domain.Playbook;
+using Sia.Shared.Data;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -14,12 +15,5 @@ namespace Sia.Data.Playbooks.Models
         public long ActionId { get; set; }
         public ICollection<Condition> Conditions { get; set; }
             = new HashSet<Condition>();
-    }
-
-    public enum ConditionSetType
-    {
-        AnyOf,
-        AllOf,
-        NoneOf
     }
 }

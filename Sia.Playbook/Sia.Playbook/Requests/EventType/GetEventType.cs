@@ -10,6 +10,7 @@ using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Sia.Domain.Playbook;
 using Sia.Shared.Requests;
+using System.Collections.Concurrent;
 
 namespace Sia.Playbook.Requests
 {
@@ -24,16 +25,18 @@ namespace Sia.Playbook.Requests
         public long EventTypeId { get; private set; }
     }
 
-    public class GetEventTypeHandler : PlaybookDatabaseHandler<GetEventTypeRequest, EventType>
+    public class GetEventTypeHandler : IAsyncRequestHandler<GetEventTypeRequest, EventType>
     {
-        public GetEventTypeHandler(PlaybookContext context) : base(context)
+        private readonly ConcurrentDictionary<long, EventType> _index;
+
+        public GetEventTypeHandler(ConcurrentDictionary<long, EventType> eventTypeIndex)
         {
+            _index = eventTypeIndex;
         }
 
-        public override async Task<EventType> Handle(GetEventTypeRequest message)
-            => Mapper.Map<EventType>(await _context
-                                        .EventTypes
-                                        .WithEagerLoading()
-                                        .FirstOrDefaultAsync(record => record.Id == message.EventTypeId));
+        public Task<EventType> Handle(GetEventTypeRequest message)
+            => _index.TryGetValue(message.EventTypeId, out var value)
+            ? Task.FromResult(value)
+            : throw new KeyNotFoundException($"Could not find Event Type with Id:{message.EventTypeId}");
     }
 }

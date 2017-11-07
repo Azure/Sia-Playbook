@@ -9,7 +9,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Sia.Playbook.Test.Requests.EventType
+namespace Sia.Playbook.Test.Requests
 {
     [TestClass]
     public class PostEventTypeTest

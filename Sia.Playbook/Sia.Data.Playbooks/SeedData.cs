@@ -204,7 +204,7 @@ namespace Sia.Data.Playbook
             var isImpactingConditionSet = new ConditionSet()
             {
                 Name = "Is Impacting",
-                Type = ConditionSetType.AllOf,
+                Type = Sia.Domain.Playbook.ConditionSetType.AllOf,
                 Conditions = new HashSet<Condition>()
                 {
                     highSeverityCondition,
@@ -214,7 +214,7 @@ namespace Sia.Data.Playbook
             var isMitigatedConditionSet = new ConditionSet()
             {
                 Name = "Is Mitigated",
-                Type = ConditionSetType.AllOf,
+                Type = Sia.Domain.Playbook.ConditionSetType.AllOf,
                 Conditions = new HashSet<Condition>()
                 {
                     highSeverityCondition,
@@ -225,7 +225,7 @@ namespace Sia.Data.Playbook
             var isWaomConditionSet = new ConditionSet()
             {
                 Name = "Is WAOM",
-                Type = ConditionSetType.AnyOf,
+                Type = Sia.Domain.Playbook.ConditionSetType.AnyOf,
                 Conditions = new HashSet<Condition>()
                 {
                     userIsWaomCondition,
@@ -235,7 +235,7 @@ namespace Sia.Data.Playbook
             var isCommsConditionSet = new ConditionSet()
             {
                 Name = "Is Comms",
-                Type = ConditionSetType.AnyOf,
+                Type = Sia.Domain.Playbook.ConditionSetType.AnyOf,
                 Conditions = new HashSet<Condition>()
                 {
                     userIsCommsCondition
@@ -285,7 +285,7 @@ namespace Sia.Data.Playbook
                     new ConditionSet()
                     {
                         Name = "This condition should always be met",
-                        Type = ConditionSetType.NoneOf,
+                        Type = Sia.Domain.Playbook.ConditionSetType.NoneOf,
                         Conditions = new HashSet<Condition>()
                     }
                 }

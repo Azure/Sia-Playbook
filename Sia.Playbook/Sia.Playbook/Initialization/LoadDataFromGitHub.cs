@@ -1,7 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Octokit;
-using Sia.Data.Playbooks;
-using Sia.Data.Playbooks.Models;
+using Sia.Domain.Playbook;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -22,7 +21,7 @@ namespace Sia.Playbook.Initialization
             return client;
         }
 
-        public static async Task AddSeedDataFromGitHub(this PlaybookContext context, string gitHubToken, string repositoryName, string repositoryOwner)
+        public static async Task AddSeedDataFromGitHub(this ConcurrentDictionary<long, EventType> eventTypeIndex, string gitHubToken, string repositoryName, string repositoryOwner)
         {
             var client = GetAuthenticatedClient(gitHubToken);
 
@@ -60,8 +59,15 @@ namespace Sia.Playbook.Initialization
                     )
                 );
 
-            context.EventTypes.AddRange(content.ToArray());
-            await context.SaveChangesAsync();
+            eventTypeIndex.AddSeedDataToDictionary(content);
+        }
+
+        public static void AddSeedDataToDictionary(this ConcurrentDictionary<long, EventType> eventTypeIndex, IEnumerable<EventType> toAdd)
+        {
+            foreach (var item in toAdd)
+            {
+                eventTypeIndex.TryAdd(item.Id, item);
+            }
         }
     }
 }

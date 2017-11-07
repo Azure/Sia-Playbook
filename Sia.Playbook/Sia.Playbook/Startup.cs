@@ -22,6 +22,8 @@ using Sia.Playbook.Initialization;
 using Sia.Shared.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Sia.Shared.Middleware;
+using System.Collections.Concurrent;
+using Sia.Domain.Playbook;
 
 namespace Sia.Playbook
 {
@@ -77,7 +79,8 @@ namespace Sia.Playbook
                     jwtOptions.Audience = Configuration["ClientId"];
                     jwtOptions.SaveToken = true;
                 });
-            if (_env.IsDevelopment()) services.AddDbContext<PlaybookContext>(options => options.UseInMemoryDatabase("Live"));
+            var eventTypeIndexSingleton = new ConcurrentDictionary<long, EventType>();
+            services.AddSingleton(context => eventTypeIndexSingleton);
             services.AddMediatR(typeof(GetEventTypeRequest).GetTypeInfo().Assembly);
         }
 
@@ -85,7 +88,7 @@ namespace Sia.Playbook
         public void Configure(IApplicationBuilder app, 
             IHostingEnvironment env, 
             ILoggerFactory loggerFactory,
-            PlaybookContext context)
+            ConcurrentDictionary<long, EventType> eventTypeIndex)
         {
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
@@ -109,14 +112,14 @@ namespace Sia.Playbook
                 || string.IsNullOrWhiteSpace(owner))
             {
                 //Load from method in source control
-                dataAddTask = context.AddSeedData();
+                //dataAddTask = context.AddSeedData();
             }
             else
             {
                 //Load from configured git repository
-                dataAddTask = context.AddSeedDataFromGitHub(token, name, owner);
+                dataAddTask = eventTypeIndex.AddSeedDataFromGitHub(token, name, owner);
+                Task.WaitAll(dataAddTask);
             }
-            Task.WaitAll(dataAddTask);
         }
 
         private static void ConfigureAuth(IServiceCollection services, IConfigurationRoot config)

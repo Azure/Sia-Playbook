@@ -1,29 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using MediatR;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Sia.Data.Playbooks;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
-using Microsoft.AspNetCore.Mvc;
-using System.Buffers;
-using Microsoft.AspNetCore.Mvc.Routing;
-using Sia.Shared.Protocol;
-using MediatR;
-using Sia.Playbook.Requests;
-using System.Reflection;
-using Sia.Data.Playbook;
-using Sia.Playbook.Initialization;
-using Sia.Shared.Authentication;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Sia.Shared.Middleware;
-using System.Collections.Concurrent;
 using Sia.Domain.Playbook;
+using Sia.Playbook.Initialization;
+using Sia.Playbook.Requests;
+using Sia.Shared.Authentication;
+using Sia.Shared.Middleware;
+using Sia.Shared.Protocol;
+using System;
+using System.Buffers;
+using System.Collections.Concurrent;
+using System.Reflection;
+using System.Threading.Tasks;
 
 namespace Sia.Playbook
 {
@@ -99,8 +94,6 @@ namespace Sia.Playbook
             app.UseAuthentication();
             app.UseSession();
             app.UseMvc();
-
-            AutoMapperStartup.InitializeAutomapper();
 
             var token = Configuration["GitHub:Token"];
             var name = Configuration["GitHub:Repository:Name"];

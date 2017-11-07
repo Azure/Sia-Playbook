@@ -1,16 +1,10 @@
 ﻿using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Sia.Domain;
-using Sia.Shared.Authentication;
-using Sia.Data.Playbooks;
-using AutoMapper;
-using Microsoft.EntityFrameworkCore;
 using Sia.Domain.Playbook;
+using Sia.Shared.Authentication;
 using Sia.Shared.Requests;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Sia.Playbook.Requests
 {

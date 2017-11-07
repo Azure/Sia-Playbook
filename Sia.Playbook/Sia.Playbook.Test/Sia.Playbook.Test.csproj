@@ -13,7 +13,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Sia.Data.Playbooks\Sia.Data.Playbook.csproj" />
     <ProjectReference Include="..\Sia.Playbook\Sia.Playbook.csproj" />
   </ItemGroup>
 

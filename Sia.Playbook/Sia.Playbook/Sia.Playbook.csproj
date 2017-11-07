@@ -35,7 +35,6 @@
     <ProjectReference Include="..\Sia-Root\Domain\Sia.Domain.ApiModels\Sia.Domain.ApiModels.csproj" />
     <ProjectReference Include="..\Sia-Root\Domain\Sia.Domain\Sia.Domain.csproj" />
     <ProjectReference Include="..\Sia-Root\Domain\Sia.Shared\Sia.Shared.csproj" />
-    <ProjectReference Include="..\Sia.Data.Playbooks\Sia.Data.Playbook.csproj" />
   </ItemGroup>
 
 </Project>

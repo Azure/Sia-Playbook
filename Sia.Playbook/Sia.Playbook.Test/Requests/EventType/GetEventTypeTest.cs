@@ -1,13 +1,9 @@
-﻿using AutoMapper.QueryableExtensions;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Sia.Data.Playbooks;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Sia.Domain.Playbook;
 using Sia.Playbook.Initialization;
 using Sia.Playbook.Requests;
-using Sia.Playbook.Test.TestDoubles;
+using System;
 using System.Collections.Concurrent;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace Sia.Playbook.Test.Requests
@@ -15,20 +11,23 @@ namespace Sia.Playbook.Test.Requests
     [TestClass]
     public class GetEventTypeTest
     {
-        [TestInitialize]
-        public void ConfigureAutomapper()
-            => AutoMapperStartup.InitializeAutomapper();
-
         [TestMethod]
         public async Task GetEventTypeHandler_Handle_WhenRecordExists_ReturnCorrectRecord()
         {
-            var context = await MockFactory.PlaybookContext(nameof(GetEventTypeHandler_Handle_WhenRecordExists_ReturnCorrectRecord));
             var eventTypeIndex = new ConcurrentDictionary<long, EventType>();
-            eventTypeIndex.AddSeedDataToDictionary(await context.EventTypes.WithEagerLoading().ProjectTo<EventType>().ToListAsync());
 
-            var eventTypeToFind = await context.EventTypes.SingleAsync(act => act.Name == "Orphaned Event Type");
-
-
+            var eventTypeToFind = new EventType()
+            {
+                Id = 5,
+                Name = "Test Event Type"
+            };
+            var additionalEventType = new EventType()
+            {
+                Id = 4,
+                Name = "UnusedEventType"
+            };
+            if (!eventTypeIndex.TryAdd(eventTypeToFind.Id, eventTypeToFind)) throw new Exception("Test setup failure when populating dictionary");
+            if (!eventTypeIndex.TryAdd(additionalEventType.Id, additionalEventType)) throw new Exception("Test setup failure when populating dictionary");
 
             var serviceUnderTest = new GetEventTypeHandler(eventTypeIndex);
             var request = new GetEventTypeRequest(eventTypeToFind.Id, null);

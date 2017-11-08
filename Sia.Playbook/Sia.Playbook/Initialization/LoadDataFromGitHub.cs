@@ -21,10 +21,8 @@ namespace Sia.Playbook.Initialization
             return client;
         }
 
-        public static async Task AddSeedDataFromGitHub(this ConcurrentDictionary<long, EventType> eventTypeIndex, string gitHubToken, string repositoryName, string repositoryOwner)
+        public static async Task AddSeedDataFromGitHub(this ConcurrentDictionary<long, EventType> eventTypeIndex, IGitHubClient client, string repositoryName, string repositoryOwner)
         {
-            var client = GetAuthenticatedClient(gitHubToken);
-
             var repo = await client.Repository.Get(repositoryOwner, repositoryName);
 
             var request = new SearchCodeRequest("EventType", repositoryOwner, repositoryName)
@@ -35,14 +33,13 @@ namespace Sia.Playbook.Initialization
 
             var result = await client.Search.SearchCode(request);
 
-            var eventTypesDictionary = new ConcurrentDictionary<string, IReadOnlyList<RepositoryContent>>();
             var eventTypesToAddTasks = result
                 .Items
-                .Select(item
-                    => client
+                .Select(async item
+                    => (await client
                     .Repository
                     .Content
-                    .GetAllContents(repo.Id, item.Path)
+                    .GetAllContents(repo.Id, item.Path))
                 ).ToArray();
 
             Task.WaitAll(eventTypesToAddTasks);

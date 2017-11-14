@@ -12,3 +12,13 @@ provided by the bot. You will only need to do this once across all repos using o
 This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/).
 For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or
 contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
+
+# Event Types:  Source Data Object Options
+
+* Event (0): data that may change for each instance of the thing happening (e.g., "this escalation went to $team", "this notification was sent to $distribution", etc.).
+    
+* Ticket (1): data that will only change for different incidents but not different events within one timeline (e.g., "ticket 100 has severity 1", "ticket 101 has severity 2", etc.).
+    
+* EventType (2): data that will be the same for every event of a given type.
+    
+* Engagement (3): data that will reflect the current user (which should be relatively rare).

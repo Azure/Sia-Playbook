@@ -88,7 +88,7 @@ namespace Sia.Playbook
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
 
-            if (env.IsDevelopment()) { app.UseDeveloperExceptionPage(); }
+            if (env.IsDevelopment() || env.IsStaging()) { app.UseDeveloperExceptionPage(); }
             else { app.UseMiddleware<ExceptionHandler>(); }
             
             app.UseAuthentication();

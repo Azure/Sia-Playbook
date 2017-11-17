@@ -110,7 +110,11 @@ namespace Sia.Playbook
             else
             {
                 //Load from configured git repository
-                dataAddTask = eventTypeIndex.AddSeedDataFromGitHub(LoadDataFromGitHub.GetAuthenticatedClient(token), name, owner);
+                dataAddTask = eventTypeIndex.AddSeedDataFromGitHub(
+                    loggerFactory,
+                    LoadDataFromGitHub.GetAuthenticatedClient(token),
+                    name,
+                    owner);
                 Task.WaitAll(dataAddTask);
             }
         }

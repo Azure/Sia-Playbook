@@ -1,4 +1,6 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.Extensions.Logging;
+using Moq;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Octokit;
 using Sia.Domain.Playbook;
 using Sia.Playbook.Initialization;
@@ -17,6 +19,7 @@ namespace Sia.Playbook.Test.Initialization
         [TestMethod]
         public async Task WhenEventTypesExist_ExpectedEventTypesAreReturned()
         {
+            ILoggerFactory mockLogger = new StubLoggerFactory();
             var expectedSearchCodeRequest = new SearchCodeRequest("EventType", MockGithubClientFactory.ExpectedOwner, MockGithubClientFactory.ExpectedRepositoryName)
             {
                 In = new[] { CodeInQualifier.Path },
@@ -31,7 +34,7 @@ namespace Sia.Playbook.Test.Initialization
             var resultObject = new ConcurrentDictionary<long, EventType>();
 
 
-            await resultObject.AddSeedDataFromGitHub(mockClient, MockGithubClientFactory.ExpectedRepositoryName, MockGithubClientFactory.ExpectedOwner);
+            await resultObject.AddSeedDataFromGitHub(mockLogger, mockClient, MockGithubClientFactory.ExpectedRepositoryName, MockGithubClientFactory.ExpectedOwner);
 
 
             Assert.IsTrue(resultObject.TryGetValue(11, out var eventTypeFromLoadedDictionary));

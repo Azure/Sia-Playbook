@@ -1,4 +1,4 @@
-# This repository is part of the SIA project that can be found at Microsoft/Sia-Root
+## This repository is part of the SIA project that can be found at Azure/Sia-Root
 
 # Starting the project
 * `git submodule init`

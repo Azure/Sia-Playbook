@@ -1,4 +1,11 @@
-    
+# This repository is part of the SIA project that can be found at Microsoft/Sia-Root
+
+# Starting the project
+* `git submodule init`
+* `git submodule update --remote`
+* Right click on the src/Sia.Playbook project in Visual Studio and select 'manage user secrets'
+* Copy the src/Sia.Playbook/usersecrets.template.json file into this window
+* Replace with your Azure Active Directory instance and playbook git repository
 
 # Usage Notes
 

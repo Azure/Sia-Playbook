@@ -73,6 +73,13 @@ namespace Sia.Playbook
                     jwtOptions.Authority = String.Format(Configuration["AzureAd:AadInstance"], Configuration["AzureAd:Tenant"]);
                     jwtOptions.Audience = Configuration["ClientId"];
                     jwtOptions.SaveToken = true;
+                    jwtOptions.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+                    {
+                        ValidateIssuer = true,
+                        ValidIssuer = String.Format(Configuration["AzureAd:AadInstance"], Configuration["ClientId"]),
+                        ValidateAudience = true,
+                        ValidAudience = Configuration["ClientId"]
+                    };
                 });
             var eventTypeIndexSingleton = new ConcurrentDictionary<long, EventType>();
             services.AddSingleton(context => eventTypeIndexSingleton);

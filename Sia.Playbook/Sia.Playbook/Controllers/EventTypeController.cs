@@ -15,6 +15,9 @@ namespace Sia.Playbook.Controllers
             : base(mediator, authConfig, urlHelper)
         {
         }
+        [HttpGet(Name = nameof(GetAll) + nameof(EventType))]
+        public async Task<IActionResult> GetAll()
+            => Ok(await _mediator.Send(new GetEventTypesRequest(_authContext)));
 
         [HttpGet("{id}", Name = nameof(Get) + nameof(EventType))]
         public async Task<IActionResult> Get(long id)

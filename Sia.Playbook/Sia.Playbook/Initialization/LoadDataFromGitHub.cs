@@ -37,16 +37,18 @@ namespace Sia.Playbook.Initialization
             {
                 return await client.Repository.Get(repositoryOwner, repositoryName);
             }
-            catch (ApiException ex)
+            catch (Exception ex)
             {
+                var errorMessageTokens = new object[] { repositoryName, repositoryOwner };
                 logger.LogError(
                     ex,
-                    "Failure to retrieve Github repository {0} with owner {1}",
-                    new object[] { repositoryName, repositoryOwner }
+                    errorMessage,
+                    errorMessageTokens
                 );
-                throw new Exception("don't commit this", ex);
+                throw new GitHubRepositoryRetrievalException(String.Format(errorMessage, errorMessageTokens), ex);
             }
         }
+        private const string errorMessage = "Failure to retrieve Github repository {0} with owner {1}";
 
         public static async Task AddSeedDataFromGitHub<T>(
             this Dictionary<long, T> index,

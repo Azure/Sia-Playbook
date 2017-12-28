@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using Octokit;
 using Sia.Domain.Playbook;
+using Sia.Shared.Data;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -12,7 +13,10 @@ namespace Sia.Playbook.Initialization
 {
     public static class LoadDataFromGitHub
     {
-        public static GitHubClient GetAuthenticatedClient(string gitHubToken, string application = "Sia-Playbook")
+        
+        public static GitHubClient GetAuthenticatedClient(
+            string gitHubToken, 
+            string application = "Sia-Playbook")
         {
             var tokenAuth = new Credentials(gitHubToken);
             var client = new GitHubClient(new ProductHeaderValue(application))
@@ -22,20 +26,16 @@ namespace Sia.Playbook.Initialization
             return client;
         }
 
-        public static async Task AddSeedDataFromGitHub(
-            this ConcurrentDictionary<long, EventType> eventTypeIndex,
-            ILoggerFactory loggerFactory,
+        public static async Task<Repository> GetRepositoryAsync(
+            ILogger logger,
             IGitHubClient client,
             string repositoryName,
             string repositoryOwner
         )
         {
-            var logger = loggerFactory.CreateLogger(nameof(LoadDataFromGitHub));
-
-            Repository repo;
             try
             {
-                repo = await client.Repository.Get(repositoryOwner, repositoryName);
+                return await client.Repository.Get(repositoryOwner, repositoryName);
             }
             catch (ApiException ex)
             {
@@ -44,10 +44,22 @@ namespace Sia.Playbook.Initialization
                     "Failure to retrieve Github repository {0} with owner {1}",
                     new object[] { repositoryName, repositoryOwner }
                 );
-                return;
+                throw new Exception("don't commit this", ex);
             }
+        }
 
-            var request = new SearchCodeRequest("EventType", repositoryOwner, repositoryName)
+        public static async Task AddSeedDataFromGitHub<T>(
+            this Dictionary<long, T> index,
+            Repository repo,
+            ILogger logger,
+            IGitHubClient client,
+            string repositoryName,
+            string repositoryOwner,
+            string searchTerm
+        )
+            where T: class, IEntity
+        {
+            var request = new SearchCodeRequest(searchTerm, repositoryOwner, repositoryName)
             {
                 In = new[] { CodeInQualifier.Path },
                 Extension = "json"
@@ -55,27 +67,27 @@ namespace Sia.Playbook.Initialization
 
             var result = await client.Search.SearchCode(request);
 
-            var eventTypesToAddTasks = result
+            var recordsToAddTasks = result
                 .Items
                 .Select(ExtractContents(client, repo)).ToArray();
 
-            Task.WaitAll(eventTypesToAddTasks
+            Task.WaitAll(recordsToAddTasks
                 .Select(taskTuple => taskTuple.contentsTask)
                 .ToArray());
-            var eventTypesToAdd = eventTypesToAddTasks
+            var recordsToAdd = recordsToAddTasks
                 .Where(taskTuple => taskTuple.contentsTask.IsCompletedSuccessfully)
                 .Select(taskTuple => (
                     contents: taskTuple.contentsTask.Result,
                     filePath: taskTuple.filePath)
                 );
 
-            LogFileRetrievalFailures(logger, eventTypesToAddTasks);
+            LogFileRetrievalFailures(logger, recordsToAddTasks);
 
-            var content = eventTypesToAdd
-                .SelectMany(DeserializeContents(logger))
+            var content = recordsToAdd
+                .SelectMany(DeserializeContents<T>(logger))
                 .Where(et => !(et is null));
 
-            eventTypeIndex.AddSeedDataToDictionary(content);
+            index.AddSeedDataToDictionary(content);
         }
 
         private static void LogFileRetrievalFailures(ILogger logger, (Task<IReadOnlyList<RepositoryContent>> contentsTask, string filePath)[] eventTypesToAddTasks)
@@ -102,17 +114,19 @@ namespace Sia.Playbook.Initialization
             }
         }
 
-        private static Func<(IReadOnlyList<RepositoryContent> contents, string filePath), IEnumerable<EventType>> DeserializeContents(ILogger logger)
+        private static Func<(IReadOnlyList<RepositoryContent> contents, string filePath), IEnumerable<T>> DeserializeContents<T>(ILogger logger)
+            where T: class
         => ((IReadOnlyList<RepositoryContent> contents, string filePath) contentTuple)
-        => contentTuple.contents.Select(TryDeserialize(logger, contentTuple.filePath));
+        => contentTuple.contents.Select(TryDeserialize<T>(logger, contentTuple.filePath));
 
-        private static Func<RepositoryContent, EventType> TryDeserialize(ILogger logger, string filePath)
+        private static Func<RepositoryContent, T> TryDeserialize<T>(ILogger logger, string filePath)
+            where T: class
         {
-            EventType tryDeserialize(RepositoryContent content)
+            T tryDeserialize(RepositoryContent content)
             {
                 try
                 {
-                    return JsonConvert.DeserializeObject<EventType>(content.Content);
+                    return JsonConvert.DeserializeObject<T>(content.Content);
                 }
                 catch (Exception ex)
                 {
@@ -139,11 +153,14 @@ namespace Sia.Playbook.Initialization
                 .GetAllContents(repo.Id, item.Path),
             filePath: item.Path);
 
-        public static void AddSeedDataToDictionary(this ConcurrentDictionary<long, EventType> eventTypeIndex, IEnumerable<EventType> toAdd)
+        public static void AddSeedDataToDictionary<T>(
+            this Dictionary<long, T> index, 
+            IEnumerable<T> toAdd)
+            where T: IEntity
         {
             foreach (var item in toAdd)
             {
-                eventTypeIndex.TryAdd(item.Id, item);
+                index.Add(item.Id, item);
             }
         }
     }

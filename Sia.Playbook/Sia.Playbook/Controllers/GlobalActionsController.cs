@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 namespace Sia.Playbook.Controllers
 {
     [Route("/globalActions/")]
-    public class GlobalActionController : BaseController
+    public class GlobalActionsController : BaseController
     {
-        public GlobalActionController(IMediator mediator, AzureActiveDirectoryAuthenticationInfo authConfig, IUrlHelper urlHelper)
+        public GlobalActionsController(IMediator mediator, AzureActiveDirectoryAuthenticationInfo authConfig, IUrlHelper urlHelper)
             : base(mediator, authConfig, urlHelper)
         {
         }

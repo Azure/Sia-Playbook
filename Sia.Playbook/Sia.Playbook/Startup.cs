@@ -90,19 +90,17 @@ namespace Sia.Playbook
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
 
+
+            var githubLoadTask = playbookData.LoadFromGithub(new GitHubConfig(Configuration, loggerFactory), loggerFactory);
+            githubLoadTask.Wait();
+
+
             if (env.IsDevelopment() || env.IsStaging()) { app.UseDeveloperExceptionPage(); }
             else { app.UseMiddleware<ExceptionHandler>(); }
-            
+
             app.UseAuthentication();
             app.UseSession();
             app.UseMvc();
-
-            var token = Configuration["GitHub:Token"];
-            var name = Configuration["GitHub:Repository:Name"];
-            var owner = Configuration["GitHub:Repository:Owner"];
-
-            var githubLoadTask = playbookData.LoadFromGithub(loggerFactory, token, name, owner);
-            githubLoadTask.Wait();
         }
 
         private static void ConfigureAuth(IServiceCollection services, IConfigurationRoot config)

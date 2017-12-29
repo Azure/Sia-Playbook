@@ -27,31 +27,21 @@ namespace Sia.Playbook.Initialization
                 .AddSingleton(EventTypes)
                 .AddSingleton(GlobalActions);
 
-        public async Task LoadFromGithub(ILoggerFactory loggerFactory, string token, string name, string owner)
+        public async Task LoadFromGithub(GitHubConfig config, ILoggerFactory loggerFactory)
         {
-            ThrowIf.NullOrWhiteSpace(token, nameof(token));
-            ThrowIf.NullOrWhiteSpace(name, nameof(name));
-            ThrowIf.NullOrWhiteSpace(owner, nameof(owner));
+            ThrowIf.Null(config, nameof(config));
+            ThrowIf.Null(loggerFactory, nameof(loggerFactory));
 
             var logger = loggerFactory.CreateLogger(nameof(PlaybookData));
                 
-            var client = LoadDataFromGitHub.GetAuthenticatedClient(token);
-            var repo = await LoadDataFromGitHub.GetRepositoryAsync(logger, client, name, owner);
-
             await _eventTypes.AddSeedDataFromGitHub(
-                repo,
                 logger,
-                client,
-                name,
-                owner,
+                config,
                 nameof(EventType));
 
             await _globalActions.AddSeedDataFromGitHub(
-                repo,
                 logger,
-                client,
-                name,
-                owner,
+                config,
                 "Global" + nameof(Domain.Playbook.Action));
         }
     }

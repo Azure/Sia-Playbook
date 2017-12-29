@@ -13,69 +13,32 @@ namespace Sia.Playbook.Initialization
 {
     public static class LoadDataFromGitHub
     {
-        
-        public static GitHubClient GetAuthenticatedClient(
-            string gitHubToken, 
-            string application = "Sia-Playbook")
-        {
-            var tokenAuth = new Credentials(gitHubToken);
-            var client = new GitHubClient(new ProductHeaderValue(application))
-            {
-                Credentials = tokenAuth
-            };
-            return client;
-        }
-
-        public static async Task<Repository> GetRepositoryAsync(
-            ILogger logger,
-            IGitHubClient client,
-            string repositoryName,
-            string repositoryOwner
-        )
-        {
-            try
-            {
-                return await client.Repository.Get(repositoryOwner, repositoryName);
-            }
-            catch (Exception ex)
-            {
-                var errorMessageTokens = new object[] { repositoryName, repositoryOwner };
-                logger.LogError(
-                    ex,
-                    errorMessage,
-                    errorMessageTokens
-                );
-                throw new GitHubRepositoryRetrievalException(String.Format(errorMessage, errorMessageTokens), ex);
-            }
-        }
-        private const string errorMessage = "Failure to retrieve Github repository {0} with owner {1}";
-
         public static async Task AddSeedDataFromGitHub<T>(
             this Dictionary<long, T> index,
-            Repository repo,
             ILogger logger,
-            IGitHubClient client,
-            string repositoryName,
-            string repositoryOwner,
+            GitHubConfig config,
             string searchTerm
         )
             where T: class, IEntity
         {
-            var request = new SearchCodeRequest(searchTerm, repositoryOwner, repositoryName)
+            var request = new SearchCodeRequest(searchTerm, config.RepositoryOwner, config.RepositoryName)
             {
                 In = new[] { CodeInQualifier.Path },
                 Extension = "json"
             };
 
-            var result = await client.Search.SearchCode(request);
+            var result = await config.Client.Search.SearchCode(request);
 
             var recordsToAddTasks = result
                 .Items
-                .Select(ExtractContents(client, repo)).ToArray();
+                .Select(ExtractContents(config.Client, config.Repository))
+                .ToArray();
 
-            Task.WaitAll(recordsToAddTasks
-                .Select(taskTuple => taskTuple.contentsTask)
-                .ToArray());
+            Task.WaitAll(
+                recordsToAddTasks
+                    .Select(taskTuple => taskTuple.contentsTask)
+                    .ToArray()
+            );
             var recordsToAdd = recordsToAddTasks
                 .Where(taskTuple => taskTuple.contentsTask.IsCompletedSuccessfully)
                 .Select(taskTuple => (

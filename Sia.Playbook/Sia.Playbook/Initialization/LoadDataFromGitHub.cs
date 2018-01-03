@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using Octokit;
 using Sia.Domain.Playbook;
+using Sia.Shared.Data;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -12,70 +13,46 @@ namespace Sia.Playbook.Initialization
 {
     public static class LoadDataFromGitHub
     {
-        public static GitHubClient GetAuthenticatedClient(string gitHubToken, string application = "Sia-Playbook")
-        {
-            var tokenAuth = new Credentials(gitHubToken);
-            var client = new GitHubClient(new ProductHeaderValue(application))
-            {
-                Credentials = tokenAuth
-            };
-            return client;
-        }
-
-        public static async Task AddSeedDataFromGitHub(
-            this ConcurrentDictionary<long, EventType> eventTypeIndex,
-            ILoggerFactory loggerFactory,
-            IGitHubClient client,
-            string repositoryName,
-            string repositoryOwner
+        public static async Task AddSeedDataFromGitHub<T>(
+            this Dictionary<long, T> index,
+            ILogger logger,
+            GitHubConfig config,
+            string searchTerm
         )
+            where T: class, IEntity
         {
-            var logger = loggerFactory.CreateLogger(nameof(LoadDataFromGitHub));
-
-            Repository repo;
-            try
-            {
-                repo = await client.Repository.Get(repositoryOwner, repositoryName);
-            }
-            catch (ApiException ex)
-            {
-                logger.LogError(
-                    ex,
-                    "Failure to retrieve Github repository {0} with owner {1}",
-                    new object[] { repositoryName, repositoryOwner }
-                );
-                return;
-            }
-
-            var request = new SearchCodeRequest("EventType", repositoryOwner, repositoryName)
+            var request = new SearchCodeRequest(searchTerm, config.RepositoryOwner, config.RepositoryName)
             {
                 In = new[] { CodeInQualifier.Path },
                 Extension = "json"
             };
 
-            var result = await client.Search.SearchCode(request);
+            var result = await config.Client.Search.SearchCode(request);
 
-            var eventTypesToAddTasks = result
+            var recordsToAddTasks = result
                 .Items
-                .Select(ExtractContents(client, repo)).ToArray();
+                .Select(ExtractContents(config.Client, config.Repository))
+                .ToArray();
 
-            Task.WaitAll(eventTypesToAddTasks
-                .Select(taskTuple => taskTuple.contentsTask)
-                .ToArray());
-            var eventTypesToAdd = eventTypesToAddTasks
+            Task.WaitAll(
+                recordsToAddTasks
+                    .Select(taskTuple => taskTuple.contentsTask)
+                    .ToArray()
+            );
+            var recordsToAdd = recordsToAddTasks
                 .Where(taskTuple => taskTuple.contentsTask.IsCompletedSuccessfully)
                 .Select(taskTuple => (
                     contents: taskTuple.contentsTask.Result,
                     filePath: taskTuple.filePath)
                 );
 
-            LogFileRetrievalFailures(logger, eventTypesToAddTasks);
+            LogFileRetrievalFailures(logger, recordsToAddTasks);
 
-            var content = eventTypesToAdd
-                .SelectMany(DeserializeContents(logger))
+            var content = recordsToAdd
+                .SelectMany(DeserializeContents<T>(logger))
                 .Where(et => !(et is null));
 
-            eventTypeIndex.AddSeedDataToDictionary(content);
+            index.AddSeedDataToDictionary(content);
         }
 
         private static void LogFileRetrievalFailures(ILogger logger, (Task<IReadOnlyList<RepositoryContent>> contentsTask, string filePath)[] eventTypesToAddTasks)
@@ -102,17 +79,19 @@ namespace Sia.Playbook.Initialization
             }
         }
 
-        private static Func<(IReadOnlyList<RepositoryContent> contents, string filePath), IEnumerable<EventType>> DeserializeContents(ILogger logger)
+        private static Func<(IReadOnlyList<RepositoryContent> contents, string filePath), IEnumerable<T>> DeserializeContents<T>(ILogger logger)
+            where T: class
         => ((IReadOnlyList<RepositoryContent> contents, string filePath) contentTuple)
-        => contentTuple.contents.Select(TryDeserialize(logger, contentTuple.filePath));
+        => contentTuple.contents.Select(TryDeserialize<T>(logger, contentTuple.filePath));
 
-        private static Func<RepositoryContent, EventType> TryDeserialize(ILogger logger, string filePath)
+        private static Func<RepositoryContent, T> TryDeserialize<T>(ILogger logger, string filePath)
+            where T: class
         {
-            EventType tryDeserialize(RepositoryContent content)
+            T tryDeserialize(RepositoryContent content)
             {
                 try
                 {
-                    return JsonConvert.DeserializeObject<EventType>(content.Content);
+                    return JsonConvert.DeserializeObject<T>(content.Content);
                 }
                 catch (Exception ex)
                 {
@@ -139,11 +118,14 @@ namespace Sia.Playbook.Initialization
                 .GetAllContents(repo.Id, item.Path),
             filePath: item.Path);
 
-        public static void AddSeedDataToDictionary(this ConcurrentDictionary<long, EventType> eventTypeIndex, IEnumerable<EventType> toAdd)
+        public static void AddSeedDataToDictionary<T>(
+            this Dictionary<long, T> index, 
+            IEnumerable<T> toAdd)
+            where T: IEntity
         {
             foreach (var item in toAdd)
             {
-                eventTypeIndex.TryAdd(item.Id, item);
+                index.Add(item.Id, item);
             }
         }
     }

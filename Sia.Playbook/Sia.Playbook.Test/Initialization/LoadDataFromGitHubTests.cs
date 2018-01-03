@@ -19,22 +19,31 @@ namespace Sia.Playbook.Test.Initialization
         [TestMethod]
         public async Task WhenEventTypesExist_ExpectedEventTypesAreReturned()
         {
-            ILoggerFactory mockLogger = new StubLoggerFactory();
-            var expectedSearchCodeRequest = new SearchCodeRequest("EventType", MockGithubClientFactory.ExpectedOwner, MockGithubClientFactory.ExpectedRepositoryName)
+            var ExpectedOwner = "ExpectedOwner";
+            var ExpectedRepositoryName = "ExpectedRepositoryName";
+
+            var mockLogger = new StubLogger();
+            var expectedSearchCodeRequest = new SearchCodeRequest("EventType", ExpectedOwner, ExpectedRepositoryName)
             {
                 In = new[] { CodeInQualifier.Path },
                 Extension = "json"
             };
-            var expectedEventTypes = new Dictionary<string, EventType>
+            var expectedPathToEventTypeDictionary = new Dictionary<string, EventType>
             {
                 { "firstExpectedPath", new EventType() { Id = 11, Name = "firstExpectedEventType" } },
                 { "secondExpectedPath", new EventType() { Id = 12, Name = "secondExpectedEventType" } }
             };
-            var mockClient = MockGithubClientFactory.Create(expectedSearchCodeRequest, expectedEventTypes);
-            var resultObject = new ConcurrentDictionary<long, EventType>();
+            var mockConfig = MockGithubConfigFactory.Create(
+                expectedSearchCodeRequest,
+                expectedPathToEventTypeDictionary,
+                1,
+                ExpectedRepositoryName,
+                ExpectedOwner
+            );
 
 
-            await resultObject.AddSeedDataFromGitHub(mockLogger, mockClient, MockGithubClientFactory.ExpectedRepositoryName, MockGithubClientFactory.ExpectedOwner);
+            var resultObject = new Dictionary<long, EventType>();
+            await resultObject.AddSeedDataFromGitHub(mockLogger, mockConfig, "EventType");
 
 
             Assert.IsTrue(resultObject.TryGetValue(11, out var eventTypeFromLoadedDictionary));

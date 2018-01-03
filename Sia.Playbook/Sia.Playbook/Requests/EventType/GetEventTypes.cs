@@ -19,9 +19,9 @@ namespace Sia.Playbook.Requests
 
     public class GetEventTypesHandler : IAsyncRequestHandler<GetEventTypesRequest, IEnumerable<EventType>>
     {
-        private readonly ConcurrentDictionary<long, EventType> _index;
+        private readonly IReadOnlyDictionary<long, EventType> _index;
 
-        public GetEventTypesHandler(ConcurrentDictionary<long, EventType> eventTypeIndex)
+        public GetEventTypesHandler(IReadOnlyDictionary<long, EventType> eventTypeIndex)
         {
             _index = eventTypeIndex;
         }

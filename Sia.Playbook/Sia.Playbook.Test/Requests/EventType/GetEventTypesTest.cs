@@ -4,6 +4,7 @@ using Sia.Playbook.Initialization;
 using Sia.Playbook.Requests;
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -15,7 +16,7 @@ namespace Sia.Playbook.Test.Requests
         [TestMethod]
         public async Task GetEventTypesHandler_Handle_ReturnAllEventTypes()
         {
-            var eventTypeIndex = new ConcurrentDictionary<long, EventType>();
+            var eventTypeIndex = new Dictionary<long, EventType>();
 
             var eventTypeToFind = new EventType()
             {

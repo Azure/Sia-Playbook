@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 namespace Sia.Playbook.Controllers
 {
     [Route("/eventTypes/")]
-    public class EventTypeController : BaseController
+    public class EventTypesController : BaseController
     {
-        public EventTypeController(IMediator mediator, AzureActiveDirectoryAuthenticationInfo authConfig, IUrlHelper urlHelper)
+        public EventTypesController(IMediator mediator, AzureActiveDirectoryAuthenticationInfo authConfig, IUrlHelper urlHelper)
             : base(mediator, authConfig, urlHelper)
         {
         }

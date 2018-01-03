@@ -74,8 +74,10 @@ namespace Sia.Playbook
                     jwtOptions.Audience = Configuration["ClientId"];
                     jwtOptions.SaveToken = true;
                 });
-            var eventTypeIndexSingleton = new ConcurrentDictionary<long, EventType>();
-            services.AddSingleton(context => eventTypeIndexSingleton);
+
+            var playbookData = new PlaybookData();
+            playbookData.RegisterData(services);
+
             services.AddMediatR(typeof(GetEventTypeRequest).GetTypeInfo().Assembly);
         }
 
@@ -83,40 +85,22 @@ namespace Sia.Playbook
         public void Configure(IApplicationBuilder app, 
             IHostingEnvironment env, 
             ILoggerFactory loggerFactory,
-            ConcurrentDictionary<long, EventType> eventTypeIndex)
+            PlaybookData playbookData)
         {
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
 
+
+            var githubLoadTask = playbookData.LoadFromGithub(new GitHubConfig(Configuration, loggerFactory), loggerFactory);
+            githubLoadTask.Wait();
+
+
             if (env.IsDevelopment() || env.IsStaging()) { app.UseDeveloperExceptionPage(); }
             else { app.UseMiddleware<ExceptionHandler>(); }
-            
+
             app.UseAuthentication();
             app.UseSession();
             app.UseMvc();
-
-            var token = Configuration["GitHub:Token"];
-            var name = Configuration["GitHub:Repository:Name"];
-            var owner = Configuration["GitHub:Repository:Owner"];
-
-            Task dataAddTask;
-            if (string.IsNullOrWhiteSpace(token)
-                || string.IsNullOrWhiteSpace(name)
-                || string.IsNullOrWhiteSpace(owner))
-            {
-                //Load from method in source control
-                //dataAddTask = context.AddSeedData();
-            }
-            else
-            {
-                //Load from configured git repository
-                dataAddTask = eventTypeIndex.AddSeedDataFromGitHub(
-                    loggerFactory,
-                    LoadDataFromGitHub.GetAuthenticatedClient(token),
-                    name,
-                    owner);
-                Task.WaitAll(dataAddTask);
-            }
         }
 
         private static void ConfigureAuth(IServiceCollection services, IConfigurationRoot config)

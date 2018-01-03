@@ -110,6 +110,9 @@ namespace Sia.Playbook.Test.TestDoubles
             T record
         )
         {
+            //https://developer.github.com/v3/repos/contents/
+            //The only part that's used by our test is the actual base64 contents
+            //So most metadata arguments are faked (null)
             var content = new RepositoryContent(
                 null,
                 null,

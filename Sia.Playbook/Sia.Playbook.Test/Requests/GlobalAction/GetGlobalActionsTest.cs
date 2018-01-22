@@ -6,6 +6,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 
@@ -35,7 +36,7 @@ namespace Sia.Playbook.Test.Requests.GlobalAction
             var serviceUnderTest = new GetGlobalActionsHandler(globalActionIndex);
 
             var request = new GetGlobalActionsRequest(null);
-            var result = await serviceUnderTest.Handle(request);
+            var result = await serviceUnderTest.Handle(request, cancellationToken: new CancellationToken());
 
             Assert.AreEqual(globalActionIndex.Values.ElementAt(0), result.ElementAt(0));
         }

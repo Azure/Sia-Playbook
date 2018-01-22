@@ -17,7 +17,7 @@ namespace Sia.Playbook.Requests
         }
     }
 
-    public class GetEventTypesHandler : IAsyncRequestHandler<GetEventTypesRequest, IEnumerable<EventType>>
+    public class GetEventTypesHandler : AsyncRequestHandler<GetEventTypesRequest, IEnumerable<EventType>>
     {
         private readonly IReadOnlyDictionary<long, EventType> _index;
 
@@ -26,8 +26,7 @@ namespace Sia.Playbook.Requests
             _index = eventTypeIndex;
         }
 
-        public Task<IEnumerable<EventType>> Handle(GetEventTypesRequest message)
+        protected override Task<IEnumerable<EventType>> HandleCore(GetEventTypesRequest message)
             => Task.FromResult(_index.Values.AsEnumerable());
-
     }
 }

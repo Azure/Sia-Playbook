@@ -17,7 +17,7 @@ namespace Sia.Playbook.Requests
         }
     }
 
-    public class GetGlobalActionsHandler : IAsyncRequestHandler<GetGlobalActionsRequest, IEnumerable<Action>>
+    public class GetGlobalActionsHandler : AsyncRequestHandler<GetGlobalActionsRequest, IEnumerable<Action>>
     {
         private readonly IReadOnlyDictionary<long, Action> _index;
 
@@ -26,7 +26,7 @@ namespace Sia.Playbook.Requests
             _index = GlobalActionIndex;
         }
 
-        public Task<IEnumerable<Action>> Handle(GetGlobalActionsRequest message)
+        protected override Task<IEnumerable<Action>> HandleCore(GetGlobalActionsRequest message)
             => Task.FromResult(_index.Values.AsEnumerable());
 
     }

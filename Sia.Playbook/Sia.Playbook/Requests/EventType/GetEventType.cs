@@ -19,7 +19,7 @@ namespace Sia.Playbook.Requests
         public long EventTypeId { get; private set; }
     }
 
-    public class GetEventTypeHandler : IAsyncRequestHandler<GetEventTypeRequest, EventType>
+    public class GetEventTypeHandler : AsyncRequestHandler<GetEventTypeRequest, EventType>
     {
         private readonly IReadOnlyDictionary<long, EventType> _index;
 
@@ -28,9 +28,10 @@ namespace Sia.Playbook.Requests
             _index = eventTypeIndex;
         }
 
-        public Task<EventType> Handle(GetEventTypeRequest message)
+        protected override Task<EventType> HandleCore(GetEventTypeRequest message)
             => _index.TryGetValue(message.EventTypeId, out var value)
             ? Task.FromResult(value)
             : throw new KeyNotFoundException($"Could not find Event Type with Id:{message.EventTypeId}");
+
     }
 }

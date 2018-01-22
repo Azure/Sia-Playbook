@@ -4,6 +4,7 @@ using Sia.Playbook.Initialization;
 using Sia.Playbook.Requests;
 using System;
 using System.Collections.Concurrent;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Sia.Playbook.Test.Requests
@@ -33,7 +34,7 @@ namespace Sia.Playbook.Test.Requests
             var request = new GetEventTypeRequest(eventTypeToFind.Id, null);
 
 
-            var result = await serviceUnderTest.Handle(request);
+            var result = await serviceUnderTest.Handle(request, cancellationToken: new CancellationToken());
 
 
             Assert.AreEqual(eventTypeToFind.Name, result.Name);

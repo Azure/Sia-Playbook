@@ -3,6 +3,7 @@ using Sia.Domain.Playbook;
 using Sia.Playbook.Initialization;
 using Sia.Playbook.Requests;
 using System;
+using System.Collections.Generic;
 using System.Collections.Concurrent;
 using System.Threading;
 using System.Threading.Tasks;
@@ -38,6 +39,33 @@ namespace Sia.Playbook.Test.Requests
 
 
             Assert.AreEqual(eventTypeToFind.Name, result.Name);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(KeyNotFoundException),
+            "Could not find Event Type with Id:1000")]
+        public async Task GetEventTypeHandler_Handle_WhenNoRecordExists_ThrowException_KeyNotFound()
+        {
+            var eventTypeIndex = new ConcurrentDictionary<long, EventType>();
+
+            var eventTypeToFind = new EventType()
+            {
+                Id = 1000,
+                Name = "Test Event Type Not In Playbook"
+            };
+            var additionalEventType = new EventType()
+            {
+                Id = 4,
+                Name = "UnusedEventType"
+            };
+
+            if (!eventTypeIndex.TryAdd(additionalEventType.Id, additionalEventType)) throw new Exception("Test setup failure when populating dictionary");
+
+            var serviceUnderTest = new GetEventTypeHandler(eventTypeIndex);
+            var request = new GetEventTypeRequest(eventTypeToFind.Id, null);
+
+
+            await serviceUnderTest.Handle(request, cancellationToken: new CancellationToken());
         }
     }
 }

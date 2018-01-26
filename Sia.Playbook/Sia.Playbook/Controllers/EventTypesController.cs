@@ -23,16 +23,6 @@ namespace Sia.Playbook.Controllers
 
         [HttpGet("{id}", Name = nameof(Get) + nameof(EventType))]
         public async Task<IActionResult> Get(long id)
-        {
-            try
-            {
-                var eventType = await _mediator.Send(new GetEventTypeRequest(id, _authContext));
-                return Ok(eventType);
-            }
-            catch (KeyNotFoundException ex)
-            {
-                return NotFound(notFoundMessage);
-            }
-        }
+            => Ok(await _mediator.Send(new GetEventTypeRequest(id, _authContext)));
     }
 }

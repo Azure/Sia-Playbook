@@ -42,9 +42,7 @@ namespace Sia.Playbook.Test.Requests
         }
 
         [TestMethod]
-        [ExpectedException(typeof(KeyNotFoundException),
-            "Could not find Event Type with Id:1000")]
-        public async Task GetEventTypeHandler_Handle_WhenNoRecordExists_ThrowException_KeyNotFound()
+        public async Task GetEventTypeHandler_Handle_WhenNoRecordExists_ReturnNull()
         {
             var eventTypeIndex = new ConcurrentDictionary<long, EventType>();
 
@@ -63,9 +61,9 @@ namespace Sia.Playbook.Test.Requests
 
             var serviceUnderTest = new GetEventTypeHandler(eventTypeIndex);
             var request = new GetEventTypeRequest(eventTypeToFind.Id, null);
+            var result = await serviceUnderTest.Handle(request, cancellationToken: new CancellationToken());
 
-
-            await serviceUnderTest.Handle(request, cancellationToken: new CancellationToken());
+            Assert.IsNull(result);
         }
     }
 }

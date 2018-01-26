@@ -4,7 +4,6 @@ using Sia.Domain.Playbook;
 using Sia.Playbook.Requests;
 using Sia.Shared.Authentication;
 using Sia.Shared.Controllers;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Sia.Playbook.Controllers

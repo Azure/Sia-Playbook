@@ -12,7 +12,6 @@ namespace Sia.Playbook.Controllers
     [Route("/eventTypes/")]
     public class EventTypesController : BaseController
     {
-        private const string notFoundMessage = "Event type not found";
         public EventTypesController(IMediator mediator, AzureActiveDirectoryAuthenticationInfo authConfig, IUrlHelper urlHelper)
             : base(mediator, authConfig, urlHelper)
         {

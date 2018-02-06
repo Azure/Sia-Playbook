@@ -95,8 +95,7 @@ namespace Sia.Playbook
             githubLoadTask.Wait();
 
 
-            if (env.IsDevelopment() || env.IsStaging()) { app.UseDeveloperExceptionPage(); }
-            else { app.UseMiddleware<ExceptionHandler>(); }
+            app.UseMiddleware<ExceptionHandler>();
 
             app.UseAuthentication();
             app.UseSession();

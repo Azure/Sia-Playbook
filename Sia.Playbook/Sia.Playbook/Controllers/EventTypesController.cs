@@ -4,6 +4,7 @@ using Sia.Domain.Playbook;
 using Sia.Playbook.Requests;
 using Sia.Shared.Authentication;
 using Sia.Shared.Controllers;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Sia.Playbook.Controllers
@@ -17,10 +18,38 @@ namespace Sia.Playbook.Controllers
         }
         [HttpGet(Name = nameof(GetAll) + nameof(EventType))]
         public async Task<IActionResult> GetAll()
-            => Ok(await _mediator.Send(new GetEventTypesRequest(_authContext)));
+        {
+            var result = await _mediator.Send(new GetEventTypesRequest(_authContext));
+            if (result != null)
+            {
+                return Ok(result);
+            }
+            else
+            {
+                return NotFound();
+            }
+        }
 
         [HttpGet("{id}", Name = nameof(Get) + nameof(EventType))]
         public async Task<IActionResult> Get(long id)
-            => Ok(await _mediator.Send(new GetEventTypeRequest(id, _authContext)));
+        {
+            try
+            {
+                var result = await _mediator.Send(new GetEventTypeRequest(id, _authContext));
+                if (result != null)
+                {
+                    return Ok(result);
+                }
+                else
+                {
+                    return NotFound();
+                }
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound();
+            }
+
+        }
     }
 }

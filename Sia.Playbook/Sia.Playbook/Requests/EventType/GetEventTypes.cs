@@ -27,16 +27,6 @@ namespace Sia.Playbook.Requests
         }
 
         protected override Task<IEnumerable<EventType>> HandleCore(GetEventTypesRequest message)
-        {
-          var result =  Task.FromResult(_index.Values.AsEnumerable());
-            if (result.Result.Any())
-            {
-                return result;
-            }
-            else
-            {
-                return null;
-            }
-        }
+            => Task.FromResult(_index.Values);
     }
 } 

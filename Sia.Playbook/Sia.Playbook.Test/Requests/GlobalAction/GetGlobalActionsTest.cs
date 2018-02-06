@@ -34,11 +34,22 @@ namespace Sia.Playbook.Test.Requests.GlobalAction
             if (!globalActionIndex.TryAdd(additionalAction.Id, additionalAction)) throw new Exception("Test setup failure when populating dictionary");
 
             var serviceUnderTest = new GetGlobalActionsHandler(globalActionIndex);
-
             var request = new GetGlobalActionsRequest(null);
+
             var result = await serviceUnderTest.Handle(request, cancellationToken: new CancellationToken());
 
             Assert.AreEqual(globalActionIndex.Values.ElementAt(0), result.ElementAt(0));
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(KeyNotFoundException))]
+        public async Task GetGlobalActionsHandler_Handle_If_No_GlobalActions_Throw_ArgumentOutOfRange_Exception()
+        {
+            var globalActionIndex = new Dictionary<long, Domain.Playbook.Action>();
+            var serviceUnderTest = new GetGlobalActionsHandler(globalActionIndex);
+            var request = new GetGlobalActionsRequest(null);
+
+            var result = await serviceUnderTest.Handle(request, cancellationToken: new CancellationToken());
         }
     }
 }

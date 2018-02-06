@@ -29,9 +29,9 @@ namespace Sia.Playbook.Requests
         }
 
         protected override Task<EventType> HandleCore(GetEventTypeRequest message)
-            => _index.TryGetValue(message.EventTypeId, out var value)
-            ? Task.FromResult(value)
-            : throw new KeyNotFoundException($"Could not find Event Type with Id:{message.EventTypeId}");
-
+        {
+            _index.TryGetValue(message.EventTypeId, out var value);
+            return Task.FromResult(value);
+        }
     }
 }

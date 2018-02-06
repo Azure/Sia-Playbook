@@ -33,11 +33,23 @@ namespace Sia.Playbook.Test.Requests
             if (!eventTypeIndex.TryAdd(additionalEventType.Id, additionalEventType)) throw new Exception("Test setup failure when populating dictionary");
 
             var serviceUnderTest = new GetEventTypesHandler(eventTypeIndex);
-
             var request = new GetEventTypesRequest(null);
+
             var result = await serviceUnderTest.Handle(request, cancellationToken: new CancellationToken());
 
             Assert.AreEqual(eventTypeIndex.Values.ElementAt(0), result.ElementAt(0));
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(KeyNotFoundException))]
+        public async Task GetEventTypesHandler_Handle_If_NotEventTypes_Throw_ArgumentOutOfRange_Exception()
+        {
+            var eventTypeIndex = new Dictionary<long, EventType>();
+            var serviceUnderTest = new GetEventTypesHandler(eventTypeIndex);
+            var request = new GetEventTypesRequest(null);
+
+            var result = await serviceUnderTest.Handle(request, cancellationToken: new CancellationToken());
+
         }
     }
 }

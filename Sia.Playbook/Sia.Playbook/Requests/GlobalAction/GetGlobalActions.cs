@@ -27,7 +27,17 @@ namespace Sia.Playbook.Requests
         }
 
         protected override Task<IEnumerable<Action>> HandleCore(GetGlobalActionsRequest message)
-            => Task.FromResult(_index.Values.AsEnumerable());
+        {
+            var result = Task.FromResult(_index.Values.AsEnumerable());
+            if (result.Result.Any())
+            {
+                return result;
+            }
+            else
+            {
+                throw new KeyNotFoundException();
+            }
+        }
 
     }
 }

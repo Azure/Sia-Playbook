@@ -28,17 +28,13 @@ namespace Sia.Playbook.Test.Requests
                 Id = 4,
                 Name = "UnusedEventType"
             };
-            if (!eventTypeIndex.TryAdd(eventTypeToFind.Id, eventTypeToFind))
-                throw new Exception("Test setup failure when populating dictionary");
-            if (!eventTypeIndex.TryAdd(additionalEventType.Id, additionalEventType))
-                throw new Exception("Test setup failure when populating dictionary");
+            if (!eventTypeIndex.TryAdd(eventTypeToFind.Id, eventTypeToFind)) throw new Exception("Test setup failure when populating dictionary");
+            if (!eventTypeIndex.TryAdd(additionalEventType.Id, additionalEventType)) throw new Exception("Test setup failure when populating dictionary");
 
             var serviceUnderTest = new GetEventTypeHandler(eventTypeIndex);
             var request = new GetEventTypeRequest(eventTypeToFind.Id, null);
 
-
             var result = await serviceUnderTest.Handle(request, cancellationToken: new CancellationToken());
-
 
             Assert.AreEqual(eventTypeToFind.Name, result.Name);
         }

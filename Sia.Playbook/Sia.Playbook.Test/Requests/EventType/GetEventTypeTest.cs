@@ -6,6 +6,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Threading;
 using System.Threading.Tasks;
+using Sia.Shared.Exceptions;
 
 namespace Sia.Playbook.Test.Requests
 {
@@ -27,8 +28,10 @@ namespace Sia.Playbook.Test.Requests
                 Id = 4,
                 Name = "UnusedEventType"
             };
-            if (!eventTypeIndex.TryAdd(eventTypeToFind.Id, eventTypeToFind)) throw new Exception("Test setup failure when populating dictionary");
-            if (!eventTypeIndex.TryAdd(additionalEventType.Id, additionalEventType)) throw new Exception("Test setup failure when populating dictionary");
+            if (!eventTypeIndex.TryAdd(eventTypeToFind.Id, eventTypeToFind))
+                throw new Exception("Test setup failure when populating dictionary");
+            if (!eventTypeIndex.TryAdd(additionalEventType.Id, additionalEventType))
+                throw new Exception("Test setup failure when populating dictionary");
 
             var serviceUnderTest = new GetEventTypeHandler(eventTypeIndex);
             var request = new GetEventTypeRequest(eventTypeToFind.Id, null);
@@ -38,6 +41,18 @@ namespace Sia.Playbook.Test.Requests
 
 
             Assert.AreEqual(eventTypeToFind.Name, result.Name);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(NotFoundException))]
+        public async Task GetEventTypeHandler_Handle_When_RecordDoesNotExist_Throw_NotFoundException()
+        {
+            var eventTypeIndex = new ConcurrentDictionary<long, EventType>();
+            var serviceUnderTest = new GetEventTypeHandler(eventTypeIndex);
+            var missingId = 1000;
+            var request = new GetEventTypeRequest(missingId, null);
+
+            var result = await serviceUnderTest.Handle(request, cancellationToken: new CancellationToken());
         }
     }
 }

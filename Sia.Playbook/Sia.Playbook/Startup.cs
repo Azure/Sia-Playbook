@@ -93,11 +93,8 @@ namespace Sia.Playbook
 
             var githubLoadTask = playbookData.LoadFromGithub(new GitHubConfig(Configuration, loggerFactory), loggerFactory);
             githubLoadTask.Wait();
-
-
-            if (env.IsDevelopment() || env.IsStaging()) { app.UseDeveloperExceptionPage(); }
-            else { app.UseMiddleware<ExceptionHandler>(); }
-
+            
+            app.UseMiddleware<ExceptionHandler>();
             app.UseAuthentication();
             app.UseSession();
             app.UseMvc();

@@ -40,5 +40,17 @@ namespace Sia.Playbook.Test.Requests.GlobalAction
 
             Assert.AreEqual(globalActionIndex.Values.ElementAt(0), result.ElementAt(0));
         }
+
+        [TestMethod]
+        public async Task GetGlobalActionsHandler_Handle__WhenNoGlobalActionsReturn_Empty_Enumerable()
+        {
+            var globalActionIndex = new Dictionary<long, Domain.Playbook.Action>();
+            var serviceUnderTest = new GetGlobalActionsHandler(globalActionIndex);
+            var request = new GetGlobalActionsRequest(null);
+
+            var result = await serviceUnderTest.Handle(request, cancellationToken: new CancellationToken());
+
+            Assert.AreEqual(0, result.Count());
+        }
     }
 }

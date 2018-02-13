@@ -6,6 +6,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Threading;
 using System.Threading.Tasks;
+using Sia.Shared.Exceptions;
 
 namespace Sia.Playbook.Test.Requests
 {
@@ -33,11 +34,21 @@ namespace Sia.Playbook.Test.Requests
             var serviceUnderTest = new GetEventTypeHandler(eventTypeIndex);
             var request = new GetEventTypeRequest(eventTypeToFind.Id, null);
 
-
             var result = await serviceUnderTest.Handle(request, cancellationToken: new CancellationToken());
 
-
             Assert.AreEqual(eventTypeToFind.Name, result.Name);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(NotFoundException))]
+        public async Task GetEventTypeHandler_Handle_When_RecordDoesNotExist_Throw_NotFoundException()
+        {
+            var eventTypeIndex = new ConcurrentDictionary<long, EventType>();
+            var serviceUnderTest = new GetEventTypeHandler(eventTypeIndex);
+            var missingId = 1000;
+            var request = new GetEventTypeRequest(missingId, null);
+
+            var result = await serviceUnderTest.Handle(request, cancellationToken: new CancellationToken());
         }
     }
 }

@@ -17,6 +17,6 @@ namespace Sia.Playbook.Controllers
         }
         [HttpGet(Name = nameof(GetAll) + "Global" + nameof(Action))]
         public async Task<IActionResult> GetAll()
-            => Ok(await _mediator.Send(new GetGlobalActionsRequest(_authContext)));
+            => OkIfAny(await _mediator.Send(new GetGlobalActionsRequest(_authContext)));
     }
 }

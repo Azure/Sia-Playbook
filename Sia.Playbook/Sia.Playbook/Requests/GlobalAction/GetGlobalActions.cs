@@ -27,7 +27,6 @@ namespace Sia.Playbook.Requests
         }
 
         protected override Task<IEnumerable<Action>> HandleCore(GetGlobalActionsRequest message)
-            => Task.FromResult(_index.Values.AsEnumerable());
-
+            => Task.FromResult(_index.Values);
     }
 }

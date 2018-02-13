@@ -5,6 +5,7 @@ using Sia.Shared.Requests;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Sia.Shared.Exceptions;
 
 namespace Sia.Playbook.Requests
 {
@@ -31,7 +32,7 @@ namespace Sia.Playbook.Requests
         protected override Task<EventType> HandleCore(GetEventTypeRequest message)
             => _index.TryGetValue(message.EventTypeId, out var value)
             ? Task.FromResult(value)
-            : throw new KeyNotFoundException($"Could not find Event Type with Id:{message.EventTypeId}");
+            : throw new NotFoundException($"Could not find Event Type with Id:{message.EventTypeId}");
 
     }
 }

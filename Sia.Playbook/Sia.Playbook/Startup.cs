@@ -97,7 +97,7 @@ namespace Sia.Playbook
             } 
             else 
             {
-                //var localLoadTask = playbookData.LoadFromPath(Configuration["Local:Path"], loggerFactory))
+                playbookData.LoadFromPath(Configuration["Local:Path"], loggerFactory);
             }
 
             app.UseMiddleware<ExceptionHandler>();

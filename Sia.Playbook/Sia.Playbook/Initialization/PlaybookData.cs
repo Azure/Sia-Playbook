@@ -4,6 +4,7 @@ using Sia.Domain.Playbook;
 using Sia.Shared.Validation;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -27,6 +28,9 @@ namespace Sia.Playbook.Initialization
                 .AddSingleton(EventTypes)
                 .AddSingleton(GlobalActions);
 
+        public const string EventTypeDirectory = "EventTypes";
+        public const string GlobalActionDirectory = "GlobalActions";
+
         public async Task LoadFromGithub(GitHubConfig config, ILoggerFactory loggerFactory)
         {
             ThrowIf.Null(config, nameof(config));
@@ -37,22 +41,25 @@ namespace Sia.Playbook.Initialization
             await _eventTypes.AddSeedDataFromGitHub(
                 logger,
                 config,
-                nameof(EventType));
+                EventTypeDirectory);
 
             await _globalActions.AddSeedDataFromGitHub(
                 logger,
                 config,
-                "Global" + nameof(Domain.Playbook.Action));
+                GlobalActionDirectory);
         }
+
 
         public void LoadFromPath(string path, ILoggerFactory loggerFactory)
         {
             ThrowIf.NullOrWhiteSpace(path, nameof(path));
             ThrowIf.Null(loggerFactory, nameof(loggerFactory));
 
-
             var logger = loggerFactory.CreateLogger(nameof(PlaybookData));
+            
+            _eventTypes.AddSeedDataFromLocal(logger, Path.Combine(path, EventTypeDirectory));
 
+            _globalActions.AddSeedDataFromLocal(logger, Path.Combine(path, GlobalActionDirectory));
         }
     }
 }

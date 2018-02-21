@@ -90,10 +90,16 @@ namespace Sia.Playbook
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
 
+            if (!String.IsNullOrWhiteSpace(Configuration["Github:Token"])) 
+            {
+                var githubLoadTask = playbookData.LoadFromGithub(new GitHubConfig(Configuration, loggerFactory), loggerFactory);
+                githubLoadTask.Wait();
+            } 
+            else 
+            {
+                //var localLoadTask = playbookData.LoadFromPath(Configuration["Local:Path"], loggerFactory))
+            }
 
-            var githubLoadTask = playbookData.LoadFromGithub(new GitHubConfig(Configuration, loggerFactory), loggerFactory);
-            githubLoadTask.Wait();
-            
             app.UseMiddleware<ExceptionHandler>();
             app.UseAuthentication();
             app.UseSession();

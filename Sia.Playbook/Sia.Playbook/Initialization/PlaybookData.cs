@@ -44,5 +44,15 @@ namespace Sia.Playbook.Initialization
                 config,
                 "Global" + nameof(Domain.Playbook.Action));
         }
+
+        public void LoadFromPath(string path, ILoggerFactory loggerFactory)
+        {
+            ThrowIf.NullOrWhiteSpace(path, nameof(path));
+            ThrowIf.Null(loggerFactory, nameof(loggerFactory));
+
+
+            var logger = loggerFactory.CreateLogger(nameof(PlaybookData));
+
+        }
     }
 }

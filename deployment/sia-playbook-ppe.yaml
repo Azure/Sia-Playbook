@@ -32,6 +32,11 @@ spec:
             env:
               - name: ASPNETCORE_ENVIRONMENT
                 value: PPE
+              - name: ClientSecret
+                valueFrom:
+                  secretKeyRef:
+                    name: sia-playbook-secret
+                    key: ClientSecret
             ports:
               - containerPort: 80
 

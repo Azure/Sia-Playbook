@@ -1,11 +1,10 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using System;
+using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Octokit;
 using Sia.Shared.Validation;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using Sia.Shared.Authentication;
 
 namespace Sia.Playbook.Initialization
 {
@@ -19,7 +18,10 @@ namespace Sia.Playbook.Initialization
 
         private const string RepositoryLoadErrorMessage = "Failure to retrieve Github repository {0} with owner {1}";
 
-
+        const string ConfigurationClientIdKey = "ClientId";
+        const string ConfigurationClientSecretKey = "ClientSecret";
+        const string ConfigurationVaultNameKey = "VaultName";
+        const string ConfigurationGithubTokenNameKey = "GithubTokenName";
         private readonly string _token;
 
         public virtual string RepositoryName { get; }
@@ -55,7 +57,21 @@ namespace Sia.Playbook.Initialization
         private IGitHubClient _client;
         public GitHubConfig(IConfigurationRoot config, ILoggerFactory loggerFactory)
         {
-            _token = ThrowIf.NullOrWhiteSpace(config[TokenConfigKey], nameof(TokenConfigKey));
+            var section = config.GetSection(TokenConfigKey);
+            _token = section.Value;
+            if (String.IsNullOrEmpty(_token))
+            {
+                var clientId = ThrowIf.NullOrWhiteSpace(config[ConfigurationClientIdKey], nameof(ConfigurationClientIdKey));
+                var clientSecret = ThrowIf.NullOrWhiteSpace(config[ConfigurationClientSecretKey], nameof(ConfigurationClientSecretKey));
+                var vaultName = ThrowIf.NullOrWhiteSpace(config[ConfigurationVaultNameKey], nameof(ConfigurationVaultNameKey));
+                var tokenName = ThrowIf.NullOrWhiteSpace(config[ConfigurationGithubTokenNameKey], nameof(ConfigurationGithubTokenNameKey));
+
+                var keyVaultConfig = new KeyVaultConfiguration(clientId, clientSecret, vaultName);
+                var keyVault = new AzureSecretVault(keyVaultConfig);
+                _token = keyVault.Get(tokenName).Result;
+            }
+
+            ThrowIf.NullOrWhiteSpace(_token, TokenConfigKey);
             RepositoryName = ThrowIf.NullOrWhiteSpace(config[RepositoryNameConfigKey], nameof(RepositoryNameConfigKey));
             RepositoryOwner = ThrowIf.NullOrWhiteSpace(config[RepositoryOwnerConfigKey], nameof(RepositoryOwnerConfigKey));
             _logger = loggerFactory.CreateLogger<GitHubConfig>();

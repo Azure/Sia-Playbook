@@ -23,7 +23,7 @@ namespace Sia.Playbook.Test.Initialization
             var ExpectedRepositoryName = "ExpectedRepositoryName";
 
             var mockLogger = new StubLogger();
-            var expectedSearchCodeRequest = new SearchCodeRequest("EventType", ExpectedOwner, ExpectedRepositoryName)
+            var expectedSearchCodeRequest = new SearchCodeRequest("EventTyper", ExpectedOwner, ExpectedRepositoryName)
             {
                 In = new[] { CodeInQualifier.Path },
                 Extension = "json"

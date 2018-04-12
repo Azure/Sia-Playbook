@@ -52,7 +52,7 @@ namespace Sia.Playbook.Initialization
                 .SelectMany(DeserializeContents<T>(logger))
                 .Where(et => !(et is null));
 
-            index.AddSeedDataToDictionary(content);
+            index.AddSeedDataToDictionary(content, logger);
         }
 
         private static void LogFileRetrievalFailures(ILogger logger, (Task<IReadOnlyList<RepositoryContent>> contentsTask, string filePath)[] eventTypesToAddTasks)
@@ -120,12 +120,24 @@ namespace Sia.Playbook.Initialization
 
         public static void AddSeedDataToDictionary<T>(
             this Dictionary<long, T> index, 
-            IEnumerable<T> toAdd)
+            IEnumerable<T> toAdd,
+            ILogger logger
+        )
             where T: IEntity
         {
             foreach (var item in toAdd)
             {
-                index.Add(item.Id, item);
+                if(item != null)
+                {
+                    try
+                    {
+                        index.Add(item.Id, item);
+                    }
+                    catch (ArgumentException ex)
+                    {
+                        logger.LogError(ex, "ArgumentException on try add to dictionary. Likely key collision on key: {0}", new object[] { item.Id });
+                    }
+                }
             }
         }
     }

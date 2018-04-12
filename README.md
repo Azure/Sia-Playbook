@@ -19,8 +19,14 @@ Event Types:  Source Data Object Options
     
 * Engagement (3): data that will reflect the current user (which should be relatively rare).
   
-    
-  
+# Github Token Notes
+
+* Github Token is private. It can be stored in .Net Application Configuration or Azure KeyVault. 
+
+* For Development or an environment running as an Azure App Service, use usersecrets.template.json as App Configuration template.
+
+* For Docker Container deployment, store your GitHub token in Azure KeyVault and use appsettings.kubernetes_template.json as App Configuration template.
+
 # Contributing
 
 This project welcomes contributions and suggestions.  Most contributions require you to agree to a

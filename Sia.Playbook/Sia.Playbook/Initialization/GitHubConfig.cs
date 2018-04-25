@@ -3,8 +3,9 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Octokit;
-using Sia.Shared.Validation;
-using Sia.Shared.Authentication;
+using Sia.Core.Validation;
+using Sia.Core.Authentication;
+using System.Globalization;
 
 namespace Sia.Playbook.Initialization
 {
@@ -86,7 +87,9 @@ namespace Sia.Playbook.Initialization
         {
             try
             {
-                return await Client.Repository.Get(RepositoryOwner, RepositoryName);
+                return await Client.Repository
+                    .Get(RepositoryOwner, RepositoryName)
+                    .ConfigureAwait(continueOnCapturedContext: false);
             }
             catch (Exception ex)
             {
@@ -98,6 +101,7 @@ namespace Sia.Playbook.Initialization
                 );
                 throw new GitHubRepositoryRetrievalException(
                     String.Format(
+                        CultureInfo.InvariantCulture,
                         RepositoryLoadErrorMessage, 
                         errorMessageTokens), 
                     ex);

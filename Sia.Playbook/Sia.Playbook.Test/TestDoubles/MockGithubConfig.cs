@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Sia.Playbook.Test.TestDoubles
 {
-    public class MockGithubConfigFactory
+    public static class MockGithubConfigFactory
     {
 
         public static GitHubConfig Create<T>(

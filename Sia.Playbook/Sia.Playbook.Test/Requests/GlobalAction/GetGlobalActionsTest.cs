@@ -36,7 +36,9 @@ namespace Sia.Playbook.Test.Requests.GlobalAction
             var serviceUnderTest = new GetGlobalActionsHandler(globalActionIndex);
 
             var request = new GetGlobalActionsRequest(null);
-            var result = await serviceUnderTest.Handle(request, cancellationToken: new CancellationToken());
+            var result = await serviceUnderTest
+                .Handle(request, cancellationToken: new CancellationToken())
+                .ConfigureAwait(continueOnCapturedContext: false);
 
             Assert.AreEqual(globalActionIndex.Values.ElementAt(0), result.ElementAt(0));
         }
@@ -48,7 +50,9 @@ namespace Sia.Playbook.Test.Requests.GlobalAction
             var serviceUnderTest = new GetGlobalActionsHandler(globalActionIndex);
             var request = new GetGlobalActionsRequest(null);
 
-            var result = await serviceUnderTest.Handle(request, cancellationToken: new CancellationToken());
+            var result = await serviceUnderTest
+                .Handle(request, cancellationToken: new CancellationToken())
+                .ConfigureAwait(continueOnCapturedContext: false);
 
             Assert.AreEqual(0, result.Count());
         }

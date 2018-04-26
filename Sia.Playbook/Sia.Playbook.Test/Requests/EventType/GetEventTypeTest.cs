@@ -6,7 +6,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Threading;
 using System.Threading.Tasks;
-using Sia.Shared.Exceptions;
+using Sia.Core.Exceptions;
 
 namespace Sia.Playbook.Test.Requests
 {
@@ -34,7 +34,9 @@ namespace Sia.Playbook.Test.Requests
             var serviceUnderTest = new GetEventTypeHandler(eventTypeIndex);
             var request = new GetEventTypeRequest(eventTypeToFind.Id, null);
 
-            var result = await serviceUnderTest.Handle(request, cancellationToken: new CancellationToken());
+            var result = await serviceUnderTest
+                .Handle(request, cancellationToken: new CancellationToken())
+                .ConfigureAwait(continueOnCapturedContext: false);
 
             Assert.AreEqual(eventTypeToFind.Name, result.Name);
         }
@@ -48,7 +50,11 @@ namespace Sia.Playbook.Test.Requests
             var missingId = 1000;
             var request = new GetEventTypeRequest(missingId, null);
 
-            var result = await serviceUnderTest.Handle(request, cancellationToken: new CancellationToken());
+            var result = await serviceUnderTest
+                .Handle(request, cancellationToken: new CancellationToken())
+                .ConfigureAwait(continueOnCapturedContext: false);
+
+            // Expect exception
         }
     }
 }

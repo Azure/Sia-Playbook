@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Sia.Domain.Playbook;
-using Sia.Shared.Validation;
+using Sia.Core.Validation;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -37,12 +37,14 @@ namespace Sia.Playbook.Initialization
             await _eventTypes.AddSeedDataFromGitHub(
                 logger,
                 config,
-                nameof(EventType));
+                nameof(EventType)
+            ).ConfigureAwait(continueOnCapturedContext: false);
 
             await _globalActions.AddSeedDataFromGitHub(
                 logger,
                 config,
-                "Global" + nameof(Domain.Playbook.Action));
+                "Global" + nameof(Domain.Playbook.Action)
+            ).ConfigureAwait(continueOnCapturedContext: false);
         }
     }
 }

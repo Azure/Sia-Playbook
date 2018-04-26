@@ -2,8 +2,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Sia.Domain.Playbook;
 using Sia.Playbook.Requests;
-using Sia.Shared.Authentication;
-using Sia.Shared.Controllers;
+using Sia.Core.Authentication;
+using Sia.Core.Controllers;
 using System.Threading.Tasks;
 
 namespace Sia.Playbook.Controllers
@@ -17,6 +17,9 @@ namespace Sia.Playbook.Controllers
         }
         [HttpGet(Name = nameof(GetAll) + "Global" + nameof(Action))]
         public async Task<IActionResult> GetAll()
-            => OkIfAny(await _mediator.Send(new GetGlobalActionsRequest(_authContext)));
+            => OkIfFound(await _mediator
+                .Send(new GetGlobalActionsRequest(AuthContext))
+                .ConfigureAwait(continueOnCapturedContext: false)
+            );
     }
 }

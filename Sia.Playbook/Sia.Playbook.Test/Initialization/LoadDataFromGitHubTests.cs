@@ -43,7 +43,9 @@ namespace Sia.Playbook.Test.Initialization
 
 
             var resultObject = new Dictionary<long, EventType>();
-            await resultObject.AddSeedDataFromGitHub(mockLogger, mockConfig, "EventType");
+            await resultObject
+                .AddSeedDataFromGitHub(mockLogger, mockConfig, "EventType")
+                .ConfigureAwait(continueOnCapturedContext: false);
 
 
             Assert.IsTrue(resultObject.TryGetValue(11, out var eventTypeFromLoadedDictionary));

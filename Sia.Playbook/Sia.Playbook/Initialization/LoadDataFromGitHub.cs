@@ -2,7 +2,7 @@
 using Newtonsoft.Json;
 using Octokit;
 using Sia.Domain.Playbook;
-using Sia.Shared.Data;
+using Sia.Core.Data;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -27,7 +27,9 @@ namespace Sia.Playbook.Initialization
                 Extension = "json"
             };
 
-            var result = await config.Client.Search.SearchCode(request);
+            var result = await config.Client.Search
+                .SearchCode(request)
+                .ConfigureAwait(continueOnCapturedContext: false);
 
             var recordsToAddTasks = result
                 .Items

@@ -11,14 +11,15 @@ using Microsoft.Extensions.Logging;
 using Sia.Domain.Playbook;
 using Sia.Playbook.Initialization;
 using Sia.Playbook.Requests;
-using Sia.Shared.Authentication;
-using Sia.Shared.Middleware;
-using Sia.Shared.Protocol;
+using Sia.Core.Authentication;
+using Sia.Core.Middleware;
+using Sia.Core.Protocol;
 using System;
 using System.Buffers;
 using System.Collections.Concurrent;
 using System.Reflection;
 using System.Threading.Tasks;
+using System.Globalization;
 
 namespace Sia.Playbook
 {
@@ -70,7 +71,7 @@ namespace Sia.Playbook
                 })
                 .AddJwtBearer(jwtOptions =>
                 {
-                    jwtOptions.Authority = String.Format(Configuration["AzureAd:AadInstance"], Configuration["AzureAd:Tenant"]);
+                    jwtOptions.Authority = String.Format(CultureInfo.InvariantCulture, Configuration["AzureAd:AadInstance"], Configuration["AzureAd:Tenant"]);
                     jwtOptions.Audience = Configuration["ClientId"];
                     jwtOptions.SaveToken = true;
                 });

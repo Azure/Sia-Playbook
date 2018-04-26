@@ -1,11 +1,11 @@
 ﻿using MediatR;
 using Sia.Domain.Playbook;
-using Sia.Shared.Authentication;
-using Sia.Shared.Requests;
+using Sia.Core.Authentication;
+using Sia.Core.Requests;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Sia.Shared.Exceptions;
+using Sia.Core.Exceptions;
 
 namespace Sia.Playbook.Requests
 {

@@ -1,6 +1,7 @@
 ﻿using Moq;
 using Newtonsoft.Json;
 using Octokit;
+using Sia.Core.Configuration.Sources.GitHub;
 using Sia.Domain.Playbook;
 using Sia.Playbook.Initialization;
 using System;
@@ -11,46 +12,13 @@ using System.Threading.Tasks;
 
 namespace Sia.Playbook.Test.TestDoubles
 {
-    public static class MockGithubConfigFactory
+    public static class GitHubMocksFactory
     {
-
-        public static GitHubConfig Create<T>(
-            SearchCodeRequest expectedRequest,
-            Dictionary<string, T> pathsToRecords,
-            long expectedRepositoryId,
-            string repoName, 
-            string repoOwner)
-        {
-            var config = new Mock<MockableGitHubConfig>();
-            config
-                .Setup(mockConfig => mockConfig.RepositoryName)
-                .Returns(repoName);
-            config
-                .Setup(mockConfig => mockConfig.RepositoryOwner)
-                .Returns(repoOwner);
-            config
-                .Setup(mockConfig => mockConfig.Client)
-                .Returns(
-                    CreateClient(
-                        expectedRequest,
-                        pathsToRecords,
-                        expectedRepositoryId,
-                        repoName,
-                        repoOwner
-                    )
-                );
-            config
-                .Setup(mockConfig => mockConfig.Repository)
-                .Returns(CreateRepository(expectedRepositoryId));
-            return config.Object;
-        }
-
         public static IGitHubClient CreateClient<T>(
             SearchCodeRequest expectedRequest, 
             Dictionary<string, T> pathsToRecords,
             long expectedRepositoryId,
-            string expectedRepositoryName,
-            string expectedOwner
+            GitHubRepositoryConfiguration repoConfig
         )
         {
             var client = new Mock<IGitHubClient>();
@@ -60,8 +28,8 @@ namespace Sia.Playbook.Test.TestDoubles
                     CreateRepositoriesClient(
                         pathsToRecords,
                         expectedRepositoryId,
-                        expectedOwner,
-                        expectedRepositoryName
+                        repoConfig.Owner,
+                        repoConfig.Name
                     )
                 );
             client
@@ -148,10 +116,5 @@ namespace Sia.Playbook.Test.TestDoubles
         
         public static SearchCode GetSearchCode(string path)
             => new SearchCode(null, path, null, null, null, null, null);
-    }
-
-    public class MockableGitHubConfig : GitHubConfig
-    {
-
     }
 }

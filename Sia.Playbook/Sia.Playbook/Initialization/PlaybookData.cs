@@ -6,11 +6,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Sia.Core.Configuration.Sources.GitHub;
 
 namespace Sia.Playbook.Initialization
 {
     public class PlaybookData
     {
+        private const string ApplicationName = "Sia-Playbook";
 
         public IReadOnlyDictionary<long, EventType> EventTypes
             => _eventTypes;
@@ -27,24 +29,32 @@ namespace Sia.Playbook.Initialization
                 .AddSingleton(EventTypes)
                 .AddSingleton(GlobalActions);
 
-        public async Task LoadFromGithub(GitHubConfig config, ILoggerFactory loggerFactory)
+        public async Task LoadFromGithub(GitHubSourceConfiguration config, ILoggerFactory loggerFactory)
         {
             ThrowIf.Null(config, nameof(config));
             ThrowIf.Null(loggerFactory, nameof(loggerFactory));
 
-            var logger = loggerFactory.CreateLogger(nameof(PlaybookData));
-                
-            await _eventTypes.AddSeedDataFromGitHub(
-                logger,
-                config,
-                nameof(EventType)
-            ).ConfigureAwait(continueOnCapturedContext: false);
+            var client = config.GetClient(ApplicationName);
 
-            await _globalActions.AddSeedDataFromGitHub(
-                logger,
-                config,
-                "Global" + nameof(Domain.Playbook.Action)
-            ).ConfigureAwait(continueOnCapturedContext: false);
+            var logger = loggerFactory.CreateLogger(nameof(PlaybookData));
+
+            _eventTypes.AddSeedDataToDictionary(
+                (await client.GetSeedDataFromGitHub<EventType>(
+                    logger,
+                    config.Repository,
+                    nameof(EventType)
+                ).ConfigureAwait(continueOnCapturedContext: false))
+                .Select(tuple => tuple.resultObject)
+            );
+
+            _globalActions.AddSeedDataToDictionary(
+                (await client.GetSeedDataFromGitHub<Domain.Playbook.Action>(
+                    logger,
+                    config.Repository,
+                    "Global" + nameof(Domain.Playbook.Action)
+                ).ConfigureAwait(continueOnCapturedContext: false))
+                .Select(tuple => tuple.resultObject)
+            );
         }
     }
 }

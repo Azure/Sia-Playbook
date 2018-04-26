@@ -10,6 +10,8 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using Sia.Core.Configuration.Sources.GitHub;
+using System.Linq;
 
 namespace Sia.Playbook.Test.Initialization
 {
@@ -19,11 +21,14 @@ namespace Sia.Playbook.Test.Initialization
         [TestMethod]
         public async Task WhenEventTypesExist_ExpectedEventTypesAreReturned()
         {
-            var ExpectedOwner = "ExpectedOwner";
-            var ExpectedRepositoryName = "ExpectedRepositoryName";
+            var repoConfig = new GitHubRepositoryConfiguration()
+            {
+                Owner = "ExpectedOwner",
+                Name = "ExpectedRepositoryName"
+            };
 
             var mockLogger = new StubLogger();
-            var expectedSearchCodeRequest = new SearchCodeRequest("EventType", ExpectedOwner, ExpectedRepositoryName)
+            var expectedSearchCodeRequest = new SearchCodeRequest("EventType", repoConfig.Owner, repoConfig.Name)
             {
                 In = new[] { CodeInQualifier.Path },
                 Extension = "json"
@@ -33,23 +38,21 @@ namespace Sia.Playbook.Test.Initialization
                 { "firstExpectedPath", new EventType() { Id = 11, Name = "firstExpectedEventType" } },
                 { "secondExpectedPath", new EventType() { Id = 12, Name = "secondExpectedEventType" } }
             };
-            var mockConfig = MockGithubConfigFactory.Create(
+            var client = GitHubMocksFactory.CreateClient<EventType>(
                 expectedSearchCodeRequest,
                 expectedPathToEventTypeDictionary,
                 1,
-                ExpectedRepositoryName,
-                ExpectedOwner
+                repoConfig
             );
 
-
-            var resultObject = new Dictionary<long, EventType>();
-            await resultObject
-                .AddSeedDataFromGitHub(mockLogger, mockConfig, "EventType")
+            var result = await client
+                .GetSeedDataFromGitHub<EventType>(mockLogger, repoConfig, "EventType")
                 .ConfigureAwait(continueOnCapturedContext: false);
+            var firstLoaded = result.First();
 
 
-            Assert.IsTrue(resultObject.TryGetValue(11, out var eventTypeFromLoadedDictionary));
-            Assert.AreEqual("firstExpectedEventType", eventTypeFromLoadedDictionary.Name);
+            Assert.AreEqual(11, firstLoaded.resultObject.Id);
+            Assert.AreEqual("firstExpectedEventType", firstLoaded.resultObject.Name);
         }
     }
 }

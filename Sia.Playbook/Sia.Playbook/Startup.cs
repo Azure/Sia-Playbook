@@ -20,6 +20,8 @@ using System.Collections.Concurrent;
 using System.Reflection;
 using System.Threading.Tasks;
 using System.Globalization;
+using Sia.Playbook.Configuration;
+using Sia.Core.Configuration.Sources.GitHub;
 
 namespace Sia.Playbook
 {
@@ -37,10 +39,11 @@ namespace Sia.Playbook
                 builder.AddUserSecrets<Startup>();
             }
             Configuration = builder.Build();
-
+            PlaybookConfig = Configuration.Get<PlaybookConfig>();
             _env = env;
         }
 
+        public PlaybookConfig PlaybookConfig { get; private set; }
         public IConfigurationRoot Configuration { get; }
 
         private readonly IHostingEnvironment _env;
@@ -91,8 +94,9 @@ namespace Sia.Playbook
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
 
-
-            var githubLoadTask = playbookData.LoadFromGithub(new GitHubConfig(Configuration, loggerFactory), loggerFactory);
+            var configFinalizeTask = PlaybookConfig.GitHub.EnsureValidTokenAsync(PlaybookConfig, PlaybookConfig.GithubTokenName);
+            configFinalizeTask.Wait();
+            var githubLoadTask = playbookData.LoadFromGithub(PlaybookConfig.GitHub, loggerFactory);
             githubLoadTask.Wait();
             
             app.UseMiddleware<ExceptionHandler>();

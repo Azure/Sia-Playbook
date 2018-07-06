@@ -93,12 +93,19 @@ namespace Sia.Playbook
         {
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
+            if (Configuration.GetSection("Github") != null)
+            {
+                var configFinalizeTask = PlaybookConfig.GitHub.EnsureValidTokenAsync(PlaybookConfig, PlaybookConfig.GithubTokenName);
+                configFinalizeTask.Wait();
+                var githubLoadTask = playbookData.LoadFromGithub(PlaybookConfig.GitHub, loggerFactory);
+                githubLoadTask.Wait();
+            }
+            else
+            {
+                playbookData.
+            }
 
-            var configFinalizeTask = PlaybookConfig.GitHub.EnsureValidTokenAsync(PlaybookConfig, PlaybookConfig.GithubTokenName);
-            configFinalizeTask.Wait();
-            var githubLoadTask = playbookData.LoadFromGithub(PlaybookConfig.GitHub, loggerFactory);
-            githubLoadTask.Wait();
-            
+
             app.UseMiddleware<ExceptionHandler>();
             app.UseAuthentication();
             app.UseSession();
